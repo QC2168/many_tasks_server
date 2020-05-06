@@ -1,0 +1,79 @@
+<?php
+
+namespace app\common\model;
+
+use think\Model;
+
+class DyTaskOrder extends Model
+{
+    protected $autoWriteTimestamp = true;
+    public function DyTaskList(){
+        return $this->hasMany('DyTaskList','dy_task_id','dy_task_id');
+    }
+    public function createDyTaskOrder()
+    {
+        $dy_task_id = request()->param('dy_task_id');
+        $check_pic = request()->file('check_pic');
+        $info = $check_pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskOrderPic');
+        if($info==false)TApiException('图片上传失败',20009, 200);
+        // 判断有无名额
+        $quota=DyTaskList::where('dy_task_id',$dy_task_id)->value('remaining_quota');
+        if($quota<=0) TApiException('任务名次没有啦!',20010, 200);
+        // 名次减一
+        DyTaskList::where('dy_task_id',$dy_task_id)->setDec('remaining_quota',1);
+        $getSaveName = str_replace("\\", "/", $info->getSaveName());
+    $this->create([
+           'dy_task_id'=>$dy_task_id,
+            'username'=>request()->username,
+            'check_pic'=>'/static/DyTaskOrderPic/' . $getSaveName,
+            'orderSn'=>create_OrderSn(),
+            'status'=>0,
+        ]);
+        return;
+    }
+
+    public function myDyTaskOrder(){
+       return $this->with('DyTaskList')->visible(['dy_task_list'=>['title','price','dy_task_pic'],'check_pic','status','orderSn','create_time'])->where('username',request()->username)->select();
+    }
+
+
+    public function changeDyOrderStatus(){
+        $orderSn = request()->param('orderSn');
+        $status = request()->param('status');
+        // 查询当前是不是与目标状态一样
+        $currentOrderStatus=$this->where('orderSn',$orderSn)->value('status');
+        if($status==$currentOrderStatus)return;
+$save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
+
+// 如果是 完成  获取价格  添加到兼职用户
+        if ($status==1){
+            // 修改为完成
+            // 获取任务ID
+            $dy_task_id=$this->where('orderSn',$orderSn)->value('dy_task_id');
+            // 获取价格
+            $price=DyTaskList::where('dy_task_id',$dy_task_id)->value('price');
+            // 添加余额
+            $add=Assets::where('username',request()->username)->setInc('wallet',$price);
+            if($add&&$save)return;
+        }if($status==2){
+            // 修改为完成
+            // 获取任务ID
+            $dy_task_id=$this->where('orderSn',$orderSn)->value('dy_task_id');
+            // 退回名额
+            $add=DyTaskList::where('dy_task_id',$dy_task_id)->setInc('remaining_quota', 1);
+            if($add&&$save)return;
+        }else{
+            if($save)return;
+        }
+
+    }
+
+    public function myPushDyTaskOrder(){
+        $dy_task_id= request()->param('dy_task_id_select');
+        // 是否是请求这个人发布的任务
+        $is=DyTaskList::where(['username'=>request()->username,'dy_task_id'=>$dy_task_id])->find();
+        if(!$is) TApiException('发布者与查询者不一致', 20007, 200);
+       return  $this->where(['dy_task_id'=>$dy_task_id])->hidden(['dy_task_id','id'])->select();
+    }
+
+}
