@@ -17,7 +17,7 @@ class TaskList extends Model
         $param=request()->param();
         // 判断这个任务是否隐藏/下架了
         $current_show=$this->where('task_id',$param['task_id'])->value('show');
-        if ($current_show==0) TApiException('任务被删除了，无法查看',20006, 200);
+        if (!$current_show) TApiException('任务被删除了，无法查看',20006, 200);
 //        return $this->with('TaskStepPic')->where('task_id',$param['task_id'])->hidden(['quota','create_time','task_id','show'])->find();
         return $this->with('TaskStepPic')->hidden(['sn','quota','create_time','task_id','show','task_step_pic'=>['sn','id','create_time']])->where('task_id',$param['task_id'])->find();
     }
@@ -28,10 +28,12 @@ class TaskList extends Model
         $param=request()->param();
         $task_step_list=json_decode($param['task_step_list'],true);
         // 首页图片
-        $task_pic=$task_step_list[0]['pic']?$task_step_list[0]['pic']:'/static/TaskPic/default_task_pic.png';
+        $task_pic=(!empty($task_step_list[0]))?$task_step_list[0]['pic']:'/static/TaskPic/default_task_pic.png';
         // 判断余额是否足够
         $push_task_price=$param['price']*$param['quota'];
-        $serve_price=$param['quota']*0.5;
+        // 根据会员来判断push task 服务费
+       $pricePerOrder=get_serve_price(request()->username,'push_task');
+        $serve_price=$param['quota']*$pricePerOrder;
        $all_price=$push_task_price+$serve_price;
        // 获取用户余额
         $user_wallet=(Assets::where('username',request()->username)->value('wallet'));
@@ -40,7 +42,7 @@ class TaskList extends Model
            //扣除余额
            Assets::where('username',request()->username)->update(['wallet'=>($user_wallet-$all_price)]);
            //创建任务
-           $this->create([
+           $aa=$this->create([
                'username'=>request()->username,
                'title'=>$param['title'],
 //               'tag'=>$param['tag'],

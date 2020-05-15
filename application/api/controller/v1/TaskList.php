@@ -23,6 +23,7 @@ public function pushTask(){
     (new TaskListValidate())->goCheck('pushTask');
     (new TaskListModel())->pushTask();
     return self::showResCodeWithOutData('发布成功');
+
 }
     public function deleteTask(){
         (new TaskListValidate())->goCheck('deleteTask');

@@ -4,15 +4,21 @@ namespace app\common\model;
 
 use app\common\validate\UserValidate;
 use app\lib\exception\BaseException;
+use think\Db;
 use think\facade\Cache;
 use think\Model;
 
 class User extends Model
 {
     protected $autoWriteTimestamp = true;
+    // 关联vip表
+    public function privilege(){
+        return $this->hasOne('Privilege','username','username');
+    }
     //注册
     public function register()
     {
+        return Db::transaction(function () {
         //获取参数
         $param = request()->param();
         if ($param['password'] !== $param['rpassword']) TApiException('密码不一致', 20003, 200);
@@ -21,21 +27,37 @@ class User extends Model
         if ($user) TApiException('该昵称已被注册', 20004, 200);
         // 获取用户填写的邀请码
         // 查询是否有这个上级
-        $power=$this->where('code',$param['code'])->value('username');
-        $addUser = User::create([
+        $fUsername=$this->where('code',$param['code'])->value('username');
+        $User=new User();
+        $addUser = $User->create([
             'username' => $param['username'],
             'password' => password_hash($param['password'], PASSWORD_DEFAULT),
             'phone' => $param['phone'],
-            'power' => $power,
+            'power' => 1,
+            'f_username' => !empty($fUsername)?$fUsername:'',
             'code' => create_InvitationCode(),
             'status' => 1,
         ]);
-        $addAssets = Assets::create([
+        $Assets=new Assets();
+        $addAssets = $Assets->create([
             'username' => $param['username'],
             'wallet' => 0,
             'deposit' => 0,
             'integral' => 0,
         ]);
+        $Privilege=new Privilege();
+        $addPrivilege=$Privilege->create([
+            'username'  =>  request()->username,
+            'vip' =>  0,
+            'expire_time' =>0,
+        ]);
+        $sign=new Sign();
+            $addSign=$sign->create([
+                'username'  =>  request()->username,
+                'continued' =>  0,
+                'last_time' =>0,
+            ]);
+        });
         return true;
     }
 
@@ -92,17 +114,24 @@ class User extends Model
     //获取用户资料
     public function get_user()
     {
-
-        return $this->where('username',request()->username)->hidden(['id','create_time','password','power','status'])->select();
-
+        return Db::transaction(function () {
+        // 判断会员过期  修改状态
+        $privilege=new Privilege();
+        // 获取过期时间
+       $expire_time=$privilege->where(['username'=>request()->username])->value('expire_time');
+        if(time()>$expire_time){
+            $privilege->save(['expire_time'=>$expire_time,'vip'=>0],['username'=>request()->username]);
+        }
+        return $this->where('username',request()->username)->with('privilege')->hidden(['id','create_time','password','power','status','privilege'=>['id','username','update_time','create_time']])->select();
+        });
     }
 
     // 获取用户团队
     public function get_team(){
-        // 获取用户邀请码  查询所有下级
-        $list= $this->where('power',request()->username)->field('username,user_pic,create_time')->select();
-        $count= $this->where('power',request()->username)->count();
-        $reward= $this->where('power',request()->username)->count()*50;
-        return ['list'=>$list,'count'=>$count,'reward'=>$reward];
+        // 查询所有下级
+        $list= $this->where('f_username',request()->username)->field('username,user_pic,create_time')->select();
+        $code= $this->where('username',request()->username)->value('code');
+        $count= $this->where('f_username',request()->username)->count();
+        return ['list'=>$list,'count'=>$count,'code'=>$code];
     }
 }

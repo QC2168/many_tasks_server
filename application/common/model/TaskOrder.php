@@ -2,6 +2,7 @@
 
 namespace app\common\model;
 
+use think\Db;
 use think\Model;
 
 class TaskOrder extends Model
@@ -64,8 +65,9 @@ $save=$this->save(['status'  => 0],['orderSn' => $orderSn]);
         return true;
     }
     public function changeOrderStatus(){
-        $orderSn = request()->param('orderSn');
-        $status = request()->param('status');
+       return Db::transaction(function () {
+            $orderSn = request()->param('orderSn');
+            $status = request()->param('status');
         // 查询当前是不是与目标状态一样
         $currentOrderStatus=$this->where('orderSn',$orderSn)->value('status');
         if($status==$currentOrderStatus)return;
@@ -79,28 +81,49 @@ $save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
             // 获取价格
             $price=TaskList::where('task_id',$task_id)->value('price');
             // 添加余额
-            $add=Assets::where('username',request()->username)->setInc('wallet',$price);
-            if($add&&$save)return;
+            $assets=new Assets();
+            $add=$assets->where('username',request()->username)->setInc('wallet',$price);
+            // 查找上级
+            $User=new User();
+            $f_username=$User->where(['username'=>request()->username])->value('f_username');
+            if(empty($f_username)){
+                // 如果没有上级就不用奖励了
+                return;
+            }
+           // 给上级添加
+            $team_reward=new TeamReward();
+            $r=$team_reward->where(['type'=>'task_reward_one'])->value('value');
+         $add_reward=$price*$r;
+            $assets->where(['username'=>$f_username])->setInc('wallet',$add_reward);
+            // 获取上级的上级
+            $f_username_f_username=$User->where(['username'=>$f_username])->value('f_username');
+            if(empty($f_username_f_username)){
+                // 如果没有上级就不用奖励了
+             return;
+            }
+            $r2=$team_reward->where(['type'=>'task_reward_two'])->value('value');
+            $add_reward2=$price*$r2;
+            $assets->where(['username'=>$f_username_f_username])->setInc('wallet',$add_reward2);
         } if($status==3){
             // 修改为完成
             // 获取任务ID
             $task_id=$this->where('orderSn',$orderSn)->value('task_id');
             // 退回名额
             $add=TaskList::where('task_id',$task_id)->setInc('remaining_quota', 1);
-            if($add&&$save)return;
+        return;
         }if($status==2){
             // 修改为完成
             // 获取任务ID
             $task_id=$this->where('orderSn',$orderSn)->value('task_id');
             // 退回名额
             $add=TaskList::where('task_id',$task_id)->setInc('remaining_quota', 1);
-            if($add&&$save)return;
+          return;
         }
         else{
-            if($save)return;
+            return;
         }
 
-
+        });
     }
 
     public function myPushTaskOrder(){

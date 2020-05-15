@@ -14,8 +14,8 @@ class UserValidate extends BaseValidate
      */	
 	protected $rule = [
 	    'username'=>'require|length:1,10',
-	    'password'=>'require|length:6,16',
-	    'rpassword'=>'require|length:6,16',
+	    'password'=>'require|length:4,16',
+	    'rpassword'=>'require|length:4,16',
 	    'phone'=>'require|mobile|regPhone',
         'code'=>'alphaNum|length:1,6',
         'feedback_content'=>'require',

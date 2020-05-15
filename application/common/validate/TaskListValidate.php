@@ -13,7 +13,7 @@ class TaskListValidate extends BaseValidate
      * @var array
      */	
 	protected $rule = [
-	    'title'=>'require|chsDash|length:2,10',
+	    'title'=>'require|chsDash|length:2,15',
 	    'tag'=>'require',
 	    'content'=>'require',
 	    'price'=>'require',

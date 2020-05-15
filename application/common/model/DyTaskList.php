@@ -35,7 +35,9 @@ class DyTaskList extends Model
         $getSaveName = str_replace("\\", "/", $info->getSaveName());
         // 判断余额是否足够
         $push_task_price = $param['price'] * $param['quota'];
-        $serve_price = $param['quota'] * 0.1;
+        // 根据会员来判断push dy task 服务费
+        $pricePerOrder=get_serve_price(request()->username,'push_dy_task');
+        $serve_price = $param['quota'] * $pricePerOrder;
         $all_price = $push_task_price + $serve_price;
         // 获取用户余额
         $user_wallet = (Assets::where('username', request()->username)->value('wallet'));
