@@ -14,6 +14,9 @@ class RewardTaskList extends Model
         $hide=['show','quota','create_time','update_time'];
         return $this->where('show','<>',0)->hidden($hide)->select();
     }
+    public function getARewardTaskList(){
+        return $this->select();
+    }
     // 添加福利任务
     public function pushRewardTask()
     {
@@ -24,7 +27,8 @@ class RewardTaskList extends Model
         // 首页图片
         $reward_task_pic=(!empty($reward_task_step_list[0]))?$reward_task_step_list[0]['pic']:'/static/TaskPic/default_task_pic.png';
         // 判断余额是否足够
-        $push_task_price=$param['price']*$param['quota'];
+        // 下单价格+红包价格 * 单数
+        $push_task_price=($param['price']+$param['money_reward'])*$param['quota'];
         // 根据会员来判断push task 服务费
         $pricePerOrder=get_serve_price(request()->username,'push_reward_task');
         $serve_price=$param['quota']*$pricePerOrder;
@@ -35,6 +39,7 @@ class RewardTaskList extends Model
             // 余额充足
             //扣除余额
             Assets::where('username',request()->username)->update(['wallet'=>($user_wallet-$all_price)]);
+            add_wallet_details(2,$all_price,"发布福利任务".$param['title']);
             //创建任务
             $this->create([
                 'username'=>request()->username,
@@ -45,6 +50,7 @@ class RewardTaskList extends Model
                 'goods_url'=>$param['goods_url'],
                 'liaison'=>$param['liaison'],
                 'price'=>$param['price'],
+                'money_reward'=>$param['money_reward'],
                 'quota'=>$param['quota'],
                 'remaining_quota'=>$param['quota'],
                 'content'=>$param['content'],
@@ -79,6 +85,7 @@ class RewardTaskList extends Model
         $reward_task_id=request()->param('reward_task_id');
         //判断发布的用户
         $isUsername=$this->where('reward_task_id',$reward_task_id)->value('username');
+        $reward_task_title=$this->where('reward_task_id',$reward_task_id)->value('title');
         if(request()->username != $isUsername)TApiException('发布者与下架不一致',20007, 200);
         // 获取状态
         $isDelete=$this->where('task_id',$reward_task_id)->value('show');
@@ -91,6 +98,7 @@ class RewardTaskList extends Model
         $returnAmount=$task_data['price']*$task_data['remaining_quota'];
         //更新
         Assets::where('username',request()->username)->setInc('wallet', $returnAmount);
+        add_wallet_details(1,$returnAmount,"下架福利任务".$reward_task_title."，返回剩下金额");
         return true;
 
     }

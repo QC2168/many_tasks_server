@@ -16,4 +16,10 @@ class RechargeKey extends BaseController
         (new RechargeKeyModel())->recharge();
         return self::showResCodeWithOutData('充值成功');
     }
+    // 创建卡密
+    public function createRechargeKey(){
+        (new RechargeKeyValidate())->goCheck('create_cKey');
+        $data=(new RechargeKeyModel())->createRechargeKey();
+        return self::showResCode('创建成功',$data);
+    }
 }

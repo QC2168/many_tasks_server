@@ -32,6 +32,7 @@ class OutOrderList extends Model
             'orderSn' => $orderSn,
             'amount' => $amount
         ]);
+        add_wallet_details(2,$amount,"账户提现");
         return $orderSn;
     }
 

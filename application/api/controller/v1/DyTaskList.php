@@ -14,6 +14,10 @@ class DyTaskList extends BaseController
         $data=(new DyTaskListModel())->getDyTaskList();
         return self::showResCode('获取成功',$data);
     }
+    public function getADyTaskList(){
+        $data=(new DyTaskListModel())->getADyTaskList();
+        return self::showResCode('获取成功',$data);
+    }
 
     public function getDyTaskDetail(){
         (new DyTaskListValidate())->goCheck('getDyTaskDetail');

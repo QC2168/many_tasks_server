@@ -21,6 +21,16 @@ function TApiException($msg='异常', $errorCode=999, $code=400){
 function _PATH(){
     return "http://121.42.13.36:9000/";
 }
+// 添加到明细
+function add_wallet_details($type,$value,$msg='未设置消息'){
+    $WalletDetails=new \app\common\model\WalletDetails();
+    $WalletDetails->create([
+        'username'=>request()->username,
+        'type'=>$type,
+        'value'=>$value,
+        'msg'=>$msg
+    ]);
+}
 // 获取服务费用
 function get_serve_price($username,$taskType){
     // 查询
@@ -29,12 +39,16 @@ function get_serve_price($username,$taskType){
     $grade= $privilege->where(['username'=>$username])->value('vip');
     if($grade==0){
         switch ($taskType){
+            // 提现手续费  百分比  0.02 =2%
             case 'out':
                 return 0.02;
+                // 发布悬赏任务
             case 'push_task':
                 return 1.5;
+            // 发布抖音任务
             case 'push_dy_task':
                 return 0.2;
+                // 发布福利任务
             case 'push_reward_task':
                 return 2.5;
         }

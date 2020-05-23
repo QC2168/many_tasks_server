@@ -22,7 +22,7 @@ public function checkVersion(){
     // 查询当前版本是否能使用
     $res = $this->where('version',$v)->value('use');
     // 检查是否能使用
-    if ($res==0)TApiException('该版本已废弃',20014,200);
+    if ($res==0)TApiException('该版本已废弃,请更新',20014,200);
 
 }
 }

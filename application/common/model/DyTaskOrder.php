@@ -15,6 +15,13 @@ class DyTaskOrder extends Model
     {
         $dy_task_id = request()->param('dy_task_id');
         $check_pic = request()->file('check_pic');
+        // 判断是不是已经领取过了该任务
+        // 查询该用户历史订单
+        $historicalOrder=$this->where(['dy_task_id'=>$dy_task_id,'username'=>request()->username])->find();
+        // 查询是不是该任务的
+        if($historicalOrder){
+            TApiException('你已经申请过该任务了!',20017, 200);
+        }
         $info = $check_pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskOrderPic');
         if($info==false)TApiException('图片上传失败',20009, 200);
         // 判断有无名额
@@ -57,6 +64,7 @@ class DyTaskOrder extends Model
                 // 添加余额
                 $assets = new Assets();
                 $add = $assets->where('username', request()->username)->setInc('wallet', $price);
+                add_wallet_details(1,$price,"完成抖音任务");
                 // 查找上级
                 $User = new User();
                 $f_username = $User->where(['username' => request()->username])->value('f_username');
@@ -69,6 +77,7 @@ class DyTaskOrder extends Model
                 $r = $team_reward->where(['type' => 'dy_task_reward_one'])->value('value');
                 $add_reward = $price * $r;
                 $assets->where(['username' => $f_username])->setInc('wallet', $add_reward);
+                add_wallet_details(1,$add_reward,"一级下级".request()->username."完成抖音任务奖励");
                 // 获取上级的上级
                 $f_username_f_username = $User->where(['username' => $f_username])->value('f_username');
                 if (empty($f_username_f_username)) {
@@ -78,6 +87,7 @@ class DyTaskOrder extends Model
                 $r2 = $team_reward->where(['type' => 'dy_task_reward_two'])->value('value');
                 $add_reward2 = $price * $r2;
                 $assets->where(['username' => $f_username_f_username])->setInc('wallet', $add_reward2);
+                add_wallet_details(1,$add_reward2,"一级下级".request()->username."完成抖音任务奖励");
             }
             if ($status == 2) {
                 // 修改为完成

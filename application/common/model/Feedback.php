@@ -12,9 +12,15 @@ class Feedback extends Model
         $feedback_content=request()->param('feedback_content');
         $this->create([
             'username'=>request()->username,
-            'value'=>$feedback_content
+            'value'=>$feedback_content,
+            'status'=>0,
         ]);
         return true;
+
+    }
+    // 获取反馈list
+    public function get_feedback_list(){
+        return $this->select();
 
     }
 }

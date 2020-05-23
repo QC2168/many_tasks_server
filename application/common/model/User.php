@@ -103,7 +103,6 @@ class User extends Model
         $token = sha1(md5(uniqid(md5(microtime(true)), true)));
         $arr['token'] = $token;
         // 登录过期时间
-//        $expire = array_key_exists('expires_in', $arr) ? $arr['expires_in'] : config('api.token_expire');
         $expire = 0;
         // 保存到缓存中
         if (!Cache::set($token, $arr, $expire)) throw new BaseException();
@@ -133,5 +132,44 @@ class User extends Model
         $code= $this->where('username',request()->username)->value('code');
         $count= $this->where('f_username',request()->username)->count();
         return ['list'=>$list,'count'=>$count,'code'=>$code];
+    }
+
+    // 获取 后台首页数据
+    public function wmsHomeData(){
+        // 获取全部数据
+        $userCount=User::where('status',"<>",'0')->count();
+        $taskCount=TaskList::where('show',"<>",'0')->count()+DyTaskList::where('show',"<>",'0')->count()+RewardTaskList::where('show',"<>",'0')->count();
+        $AllOrderCount=DyTaskOrder::count('id')+TaskOrder::count('id')+RewardTaskOrder::count('id');
+        // 获取当天数据
+        $toDayUserCount=User::where('status',"<>",'0')->whereTime('create_time', 'today')->count();
+        $toDayTaskCount=TaskList::where('show',"<>",'0')->whereTime('create_time', 'today')->count()+DyTaskList::where('show',"<>",'0')->whereTime('create_time', 'today')->count()+RewardTaskList::where('show',"<>",'0')->whereTime('create_time', 'today')->count();
+        $toDayAllOrderCount=DyTaskOrder::whereTime('create_time', 'today')->count('id')+TaskOrder::whereTime('create_time', 'today')->count('id')+RewardTaskOrder::whereTime('create_time', 'today')->count('id');
+        // 获取全部提现金额
+        $AllOutAmount=OutOrderList::sum('amount');
+        $toDayAllOutAmount=OutOrderList::whereTime('create_time', 'today')->sum('amount');
+        // 最近订单5个
+        $latelyOrderData=DyTaskOrder::limit(0,5)->select();
+        $serveInfo=[
+            '操作系统' => PHP_OS,
+            '运行环境' => $_SERVER["SERVER_SOFTWARE"],
+            'MYSQL'=>Db::query('select VERSION() as sqlversion')[0]['sqlversion'],
+            '主机名' => $_SERVER['SERVER_NAME'],
+            'WEB服务端口' => $_SERVER['SERVER_PORT'],
+            '网站文档目录' => $_SERVER["DOCUMENT_ROOT"],
+            'PHP版本' => PHP_VERSION,
+            '服务器域名/IP' => $_SERVER['SERVER_NAME'] . ' [ ' . gethostbyname($_SERVER['SERVER_NAME']) . ' ]',
+            '用户的IP地址' => $_SERVER['REMOTE_ADDR'],
+            '剩余空间' => round((disk_free_space(".") / (1024 * 1024)), 2) . 'M',
+        ];
+        $outOrder=['sum'=>$AllOutAmount,'today'=>$toDayAllOrderCount,'title'=>'提现订单MODUL'];
+        $taskdataorder=['sum'=>$taskCount,'today'=>$toDayTaskCount,'title'=>'任务订单MODUL'];
+        $user=['sum'=>$userCount,'today'=>$toDayUserCount,'title'=>'用户MODUL'];
+        return [
+            'modulData'=>['outOrder'=>$outOrder,'taskdataorder'=>$taskdataorder,'user'=>$user],
+            'money'=>['AllOutAmount'=>$AllOutAmount,'toDayAllOutAmount'=>$toDayAllOutAmount],
+            'chart'=>[['name'=>'All任务订单','value'=>$AllOrderCount],['name'=>'任务数量','value'=>$taskCount],['name'=>'用户数量','value'=>$userCount]],
+            'latelyOrder'=>$latelyOrderData,
+            'serveInfo'=>$serveInfo
+        ];
     }
 }

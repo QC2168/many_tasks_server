@@ -13,7 +13,9 @@ class RechargeKeyValidate extends BaseValidate
      * @var array
      */	
 	protected $rule = [
-        'cKey'=>'require|isCKey'
+        'cKey'=>'require|length:32|isCKey',
+        'create_number'=>'require|number|between:1,100',
+        'create_money'=>'require|number'
     ];
     
     /**
@@ -22,9 +24,12 @@ class RechargeKeyValidate extends BaseValidate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'create_number.between'=>'创建数量不符合内置要求'
+    ];
 
     protected $scene=[
-      'cKey'=>'cKey'
+      'cKey'=>'cKey',
+      'create_cKey'=>['create_number','create_money'],
     ];
 }

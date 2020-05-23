@@ -18,6 +18,7 @@ class RewardTaskListValidate extends BaseValidate
         'reward_goods_type'=>'require|isRewardGoodsType',
         'content'=>'require',
         'price'=>'require',
+        'money_reward'=>'require',
         'goods_url'=>'require|url',
         'liaison'=>'require',
         'quota'=>'require|number|between:1,300',
@@ -37,7 +38,7 @@ class RewardTaskListValidate extends BaseValidate
     protected $message = [];
 
     protected $scene = [
-        'pushRewardTask'  =>  ['title','reward_goods_platform_type','reward_goods_type','content','goods_url','liaison','price','quota','is_btn','reward_task_step_list','keyword'],
+        'pushRewardTask'  =>  ['title','money_reward','reward_goods_platform_type','reward_goods_type','content','goods_url','liaison','price','quota','is_btn','reward_task_step_list','keyword'],
         'getRewardTaskDetail'  =>  ['reward_task_id'],
         'getTaskOrderInfo'  =>  ['task_id'],
         'deleteTask'  =>  ['task_id'],

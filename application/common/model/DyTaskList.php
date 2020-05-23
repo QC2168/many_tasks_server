@@ -13,6 +13,11 @@ class DyTaskList extends Model
     {
         return $this->where('show', '<>', 0)->hidden(['show', 'quota'])->select();
     }
+    // 获取 抖音任务列表
+    public function getADyTaskList()
+    {
+        return $this->select();
+    }
 
     //获取详情
     public function getDyTaskDetail()
@@ -45,6 +50,7 @@ class DyTaskList extends Model
             // 余额充足
             //扣除余额
             Assets::where('username', request()->username)->update(['wallet' => ($user_wallet - $all_price)]);
+            add_wallet_details(2,$all_price,"发布抖音任务".$param['title']);
             //创建任务
             $this->create([
                 'username' => request()->username,
@@ -70,6 +76,7 @@ class DyTaskList extends Model
         $dy_task_id = request()->param('dy_task_id');
         //判断发布的用户
         $isUsername = $this->where('dy_task_id', $dy_task_id)->value('username');
+        $title = $this->where('dy_task_id', $dy_task_id)->value('title');
         if (request()->username != $isUsername) TApiException('发布者与下架不一致', 20007, 200);
         // 获取状态
         $isdelete = $this->where('dy_task_id', $dy_task_id)->value('show');
@@ -82,6 +89,7 @@ class DyTaskList extends Model
         $returnAmount = $task_data['price'] * $task_data['remaining_quota'];
         //更新
         Assets::where('username', request()->username)->setInc('wallet', $returnAmount);
+        add_wallet_details(1,$returnAmount,"下架抖音任务".$title."，返回剩下金额");
         return true;
 
     }

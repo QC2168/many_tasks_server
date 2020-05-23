@@ -14,6 +14,10 @@ class TaskList extends BaseController
         $list=(new TaskListModel())->getTaskList();
         return self::showResCode('获取成功',$list);
     }
+    public function getATaskList(){
+        $list=(new TaskListModel())->getATaskList();
+        return self::showResCode('获取成功',$list);
+    }
     public function getTaskDetail(){
         (new TaskListValidate())->goCheck('getTaskDetail');
         $data=(new TaskListModel())->getTaskDetail();

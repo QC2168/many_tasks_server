@@ -13,6 +13,9 @@ class TaskList extends Model
     public function getTaskList(){
         return $this->where('show','<>',0)->hidden(['show','quota'])->select();
     }
+    public function getATaskList(){
+        return $this->select();
+    }
     public function getTaskDetail(){
         $param=request()->param();
         // 判断这个任务是否隐藏/下架了
@@ -41,6 +44,7 @@ class TaskList extends Model
            // 余额充足
            //扣除余额
            Assets::where('username',request()->username)->update(['wallet'=>($user_wallet-$all_price)]);
+           add_wallet_details(2,$all_price,"发布悬赏任务".$param['title']);
            //创建任务
            $aa=$this->create([
                'username'=>request()->username,
@@ -79,6 +83,7 @@ class TaskList extends Model
         $task_id=request()->param('task_id');
         //判断发布的用户
         $isUsername=$this->where('task_id',$task_id)->value('username');
+        $task_title=$this->where('task_id',$task_id)->value('title');
         if(request()->username != $isUsername)TApiException('发布者与下架不一致',20007, 200);
         // 获取状态
         $isdelete=$this->where('task_id',$task_id)->value('show');
@@ -91,6 +96,7 @@ class TaskList extends Model
         $returnAmount=$task_data['price']*$task_data['remaining_quota'];
         //更新
         Assets::where('username',request()->username)->setInc('wallet', $returnAmount);
+        add_wallet_details(1,$returnAmount,"下架悬赏任务".$task_title."，返回剩下金额");
         return true;
 
     }

@@ -53,6 +53,7 @@ class Sign extends Model
                     'username'=>request()->username,
                     'price'=>$randomPrice
                 ]);
+                add_wallet_details(1,$randomPrice,'签到奖励');
                 return "签到成功，本次获得{$randomPrice}元";
             }
 

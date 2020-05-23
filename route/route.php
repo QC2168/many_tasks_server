@@ -12,6 +12,7 @@
 Route::group('api/:version/',function (){
     Route::post('register','api/:version.User/register');
     Route::post('login','api/:version.User/login');
+    Route::post('A_login','api/:version.AdminUser/login');
     Route::get('get_task_list','api/:version.TaskList/getTaskList');
     Route::get('get_reward_task_list','api/:version.RewardTaskList/getRewardTaskList');
     Route::get('get_dy_task_list','api/:version.DyTaskList/getDyTaskList');
@@ -40,6 +41,7 @@ Route::group('api/:version/',function(){
     Route::get('my_push_reward_task_order','api/:version.RewardTaskOrder/myPushRewardTaskOrder');
     Route::get('get_out_order','api/:version.OutOrderList/getOutOrder');
     Route::get('get_team','api/:version.User/team');
+    Route::get('get_user_wallet_details','api/:version.Assets/getUserWalletDetails');
     Route::post('push_task','api/:version.TaskList/pushTask');
     Route::post('push_reward_task','api/:version.RewardTaskList/pushRewardTask');
     Route::post('sign','api/:version.Sign/sign');
@@ -68,3 +70,12 @@ Route::group('api/:version/',function(){
     Route::post('updateV','api/:version.Info/updateV');
     Route::post('check_version','api/:version.Info/checkVersion');
 })->middleware('ApiUserAuth');
+
+Route::group('api/:version/',function (){
+    Route::get('get_a_task_list','api/:version.TaskList/getATaskList');
+    Route::get('wms_home_data','api/:version.Info/wmsHomeData');
+    Route::get('get_a_reward_task_list','api/:version.RewardTaskList/getARewardTaskList');
+    Route::get('get_a_dy_task_list','api/:version.DyTaskList/getADyTaskList');
+    Route::post('create_recharge_key','api/:version.RechargeKey/createRechargeKey');
+    Route::get('get_feedback_list','api/:version.Feedback/getFeedbackList');
+})->middleware('ApiAdminAuth');

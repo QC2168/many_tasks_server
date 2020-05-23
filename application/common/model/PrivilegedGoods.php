@@ -34,6 +34,7 @@ public function buyPrivilegedGoods(){
     if($goodsPrice>$userWallet)TApiException('余额不足',20012,200);
     // 扣除
     $userWallet=$assets->where('username',request()->username)->setDec('wallet',$goodsPrice);
+        add_wallet_details(2,$goodsPrice,"购买特权");
     // 添加会员信息
     $privilege=new Privilege();
     $expire_time= strtotime("+{$goodsTerm}day");

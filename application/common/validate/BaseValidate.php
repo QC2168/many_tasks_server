@@ -57,7 +57,7 @@ class BaseValidate extends Validate
 
     protected function isDyTaskOrderSn($value, $rule = '', $data = '', $field = '')
     {
-        if ($order = \app\common\model\DyTaskOrder::field('orderSn')->where(['orderSn' => $value, 'username' => request()->username])->find()) {
+        if ($order = \app\common\model\DyTaskOrder::field('orderSn')->where(['orderSn' => $value])->find()) {
             return true;
         }
         return "您没有该DY任务订单";
@@ -100,7 +100,7 @@ class BaseValidate extends Validate
     }
     protected function isTaskOrderSn($value, $rule = '', $data = '', $field = '')
     {
-        if ( \app\common\model\TaskOrder::field('orderSn')->where(['orderSn' => $value, 'username' => request()->username])->find()) {
+        if ( \app\common\model\TaskOrder::field('orderSn')->where(['orderSn' => $value])->find()) {
             return true;
         }
         return "您没有该XS任务订单";
@@ -108,7 +108,7 @@ class BaseValidate extends Validate
     }
     protected function isRewardTaskOrderSn($value, $rule = '', $data = '', $field = '')
     {
-        if ( \app\common\model\RewardTaskOrder::field('orderSn')->where(['orderSn' => $value, 'username' => request()->username])->find()) {
+        if ( \app\common\model\RewardTaskOrder::field('orderSn')->where(['orderSn' => $value])->find()) {
             return true;
         }
         return "您没有该Fl任务订单";
@@ -121,7 +121,7 @@ class BaseValidate extends Validate
         if (is_array($arr)) {
             return true;
         };
-        return "NOArr";
+        return "NOT ARRAY";
     }
 
     protected function typeName($value, $rule = '', $data = '', $field = '')

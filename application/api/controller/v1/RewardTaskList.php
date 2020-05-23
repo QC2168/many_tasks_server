@@ -13,6 +13,10 @@ class RewardTaskList extends BaseController
         $list=(new RewardTaskListModel())->getRewardTaskList();
         return self::showResCode('获取成功',$list);
     }
+    public function getARewardTaskList(){
+        $list=(new RewardTaskListModel())->getARewardTaskList();
+        return self::showResCode('获取成功',$list);
+    }
     public function getRewardTaskDetail(){
         (new RewardTaskListValidate())->goCheck('getRewardTaskDetail');
         $data=(new RewardTaskListModel())->getRewardTaskDetail();
