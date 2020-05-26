@@ -42,6 +42,7 @@ class Sign extends Model
                    'username'=>request()->username,
                    'price'=>$addPrice
                 ]);
+                add_wallet_details(1,$addPrice,'签到奖励');
                 return "签到成功，本次获得{$addPrice}元";
             }else{
                 $assets=new Assets();

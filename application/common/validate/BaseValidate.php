@@ -158,4 +158,14 @@ class BaseValidate extends Validate
 
     }
 
+    // 是否有改提现订单
+    protected function isOutOrderSn($value, $rule = '', $data = '', $field = '')
+    {
+        if ($order = \app\common\model\OutOrderList::field('orderSn')->where(['orderSn' => $value])->find()) {
+            return true;
+        }
+        return "您没有该提现订单";
+
+    }
+
 }

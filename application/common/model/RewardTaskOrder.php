@@ -100,10 +100,12 @@ class RewardTaskOrder extends Model
                 $task_id=$this->where('orderSn',$orderSn)->value('reward_task_id');
                 // 获取价格
                 $price=RewardTaskList::where('reward_task_id',$task_id)->value('price');
+                $money_reward=RewardTaskList::where('reward_task_id',$task_id)->value('money_reward');
+                $AllPrice=$price+$money_reward;
                 // 添加余额
                 $assets=new Assets();
-                $add=$assets->where('username',request()->username)->setInc('wallet',$price);
-                add_wallet_details(1,$price,"完成福利任务");
+                $add=$assets->where('username',request()->username)->setInc('wallet',$AllPrice);
+                add_wallet_details(1,$AllPrice,"完成福利任务");
                 // 查找上级
                 $User=new User();
                 $f_username=$User->where(['username'=>request()->username])->value('f_username');
@@ -114,7 +116,7 @@ class RewardTaskOrder extends Model
                 // 给上级添加
                 $team_reward=new TeamReward();
                 $r=$team_reward->where(['type'=>'task_reward_one'])->value('value');
-                $add_reward=$price*$r;
+                $add_reward=$money_reward*$r;
                 $assets->where(['username'=>$f_username])->setInc('wallet',$add_reward);
                 add_wallet_details(1,$add_reward,"一级下级".request()->username."完成福利任务奖励");
                 // 获取上级的上级
@@ -124,7 +126,7 @@ class RewardTaskOrder extends Model
                     return;
                 }
                 $r2=$team_reward->where(['type'=>'task_reward_two'])->value('value');
-                $add_reward2=$price*$r2;
+                $add_reward2=$money_reward*$r2;
                 $assets->where(['username'=>$f_username_f_username])->setInc('wallet',$add_reward2);
                 add_wallet_details(1,$add_reward2,"一级下级".request()->username."完成福利任务奖励");
             }

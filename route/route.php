@@ -73,9 +73,12 @@ Route::group('api/:version/',function(){
 
 Route::group('api/:version/',function (){
     Route::get('get_a_task_list','api/:version.TaskList/getATaskList');
+    Route::get('get_a_out_order','api/:version.OutOrderList/getAOutOrder');
+    Route::get('get_a_recharge_key','api/:version.RechargeKey/getARechargeKey');
     Route::get('wms_home_data','api/:version.Info/wmsHomeData');
     Route::get('get_a_reward_task_list','api/:version.RewardTaskList/getARewardTaskList');
     Route::get('get_a_dy_task_list','api/:version.DyTaskList/getADyTaskList');
     Route::post('create_recharge_key','api/:version.RechargeKey/createRechargeKey');
+    Route::post('change_a_out_order_status','api/:version.OutOrderList/changeAOutOrderStatus');
     Route::get('get_feedback_list','api/:version.Feedback/getFeedbackList');
 })->middleware('ApiAdminAuth');

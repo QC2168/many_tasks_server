@@ -19,4 +19,13 @@ class OutOrderList extends BaseController
         $orderList=(new OutOrderListModel())->getOutOrder();
         return self::showResCode('获取成功',$orderList);
     }
+    public function getAOutOrder(){
+        $orderList=(new OutOrderListModel())->getAOutOrder();
+        return self::showResCode('获取成功',$orderList);
+    }
+    public function changeAOutOrderStatus(){
+        (new OutOrderListValidate())->goCheck('changeAOutOrderStatus');
+        (new OutOrderListModel())->changeAOutOrderStatus();
+        return self::showResCodeWithOutData('修改成功');
+    }
 }

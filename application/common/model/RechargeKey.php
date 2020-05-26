@@ -46,6 +46,11 @@ class RechargeKey extends Model
             TApiException('创建出错了',20016,200);
         }
         return $cKey;
+    }
 
+    // 获取所有充值key
+    public function getARechargeKey(){
+        $page=request()->param('index');
+        return $this->page($page,10)->select();
     }
 }

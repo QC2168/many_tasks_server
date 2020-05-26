@@ -13,7 +13,9 @@ class OutOrderListValidate extends BaseValidate
      * @var array
      */
     protected $rule = [
-        'amount'=>'number|istenfold'
+        'amount'=>'number|istenfold',
+        'target'=>'number|between:0,2',
+        'orderSn'=>'require|isOutOrderSn',
     ];
     
     /**
@@ -24,6 +26,7 @@ class OutOrderListValidate extends BaseValidate
      */	
     protected $message = [];
     protected $scene = [
-        'out'=>'amount'
+        'out'=>'amount',
+        'changeAOutOrderStatus'=>['target','orderSn'],
     ];
 }

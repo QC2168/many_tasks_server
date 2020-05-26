@@ -16,7 +16,8 @@ class DyTaskList extends Model
     // 获取 抖音任务列表
     public function getADyTaskList()
     {
-        return $this->select();
+        $page=request()->param('index');
+        return $this->page($page,10)->select();
     }
 
     //获取详情

@@ -22,4 +22,9 @@ class RechargeKey extends BaseController
         $data=(new RechargeKeyModel())->createRechargeKey();
         return self::showResCode('创建成功',$data);
     }
+    // 获取卡密
+    public function getARechargeKey(){
+        $data=(new RechargeKeyModel())->getARechargeKey();
+        return self::showResCode('获取成功',$data);
+    }
 }

@@ -14,7 +14,8 @@ class TaskList extends Model
         return $this->where('show','<>',0)->hidden(['show','quota'])->select();
     }
     public function getATaskList(){
-        return $this->select();
+        $page=request()->param('index');
+        return $this->page($page,10)->select();
     }
     public function getTaskDetail(){
         $param=request()->param();

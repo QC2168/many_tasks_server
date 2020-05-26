@@ -15,7 +15,8 @@ class RewardTaskList extends Model
         return $this->where('show','<>',0)->hidden($hide)->select();
     }
     public function getARewardTaskList(){
-        return $this->select();
+        $page=request()->param('index');
+        return $this->page($page,10)->select();
     }
     // 添加福利任务
     public function pushRewardTask()

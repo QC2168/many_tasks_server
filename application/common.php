@@ -83,3 +83,13 @@ function create_InvitationCode()
     ) ;
     return $d;
 }
+
+// 获取上级
+function get_f_username($username){
+    return \app\common\model\User::where('username',$username)->value('f_username');
+}
+
+// 获取福利对应的数据
+function get_reward_value($type){
+    return \app\common\model\TeamReward::where(['type'=>$type])->value('value');
+}
