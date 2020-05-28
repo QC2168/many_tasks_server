@@ -36,4 +36,9 @@ class DyTaskOrder extends BaseController
        $data= (new DyTaskOrderModel())->myPushDyTaskOrder();
        return self::showResCode('获取成功',$data);
     }
+    // 后台获取订单
+    public function getADyTaskOrderList(){
+        $data=(new DyTaskOrderModel())->getADyTaskOrderList();
+        return self::showResCode('获取成功',$data);
+    }
 }

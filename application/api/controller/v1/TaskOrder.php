@@ -67,4 +67,9 @@ class TaskOrder extends BaseController
         $data=(new TaskOrderModel())->selectOrderPic();
         return self::showResCode('获取成功',$data);
 }
+// 后台获取订单
+    public function getATaskOrderList(){
+        $data=(new TaskOrderModel())->getATaskOrderList();
+        return self::showResCode('获取成功',$data);
+    }
 }

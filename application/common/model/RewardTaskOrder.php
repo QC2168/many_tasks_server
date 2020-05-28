@@ -44,7 +44,7 @@ class RewardTaskOrder extends Model
         $picList = request()->param('pic_list');
         $currentOrderStatus=$this->where('orderSn',$orderSn)->value('status');
         if($currentOrderStatus!=4) TApiException('该福利任务订单已经是待审核状态',20018,200);
-        $save=$this->save(['status'  => 5],['orderSn' => $orderSn]);
+        $save=$this->save(['status'  => 5,'content'=>$content,'goods_orderSn'=>$goodsOrderSn],['orderSn' => $orderSn]);
 //提交图片
         $reward_task_order_pic=new RewardTaskOrderPic();
         // 判断有没有图片列表
@@ -159,5 +159,12 @@ class RewardTaskOrder extends Model
             }
 
         });
+    }
+
+    public function getARewardTaskOrderList(){
+        $page=request()->param('index');
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
     }
 }

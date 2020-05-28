@@ -16,4 +16,5 @@ return [
     // 默认中间件命名空间
     app\http\middleware\ApiUserAuth::class,
     app\http\middleware\ApiAdminAuth::class,
+    app\http\middleware\CrossDomain::class
 ];

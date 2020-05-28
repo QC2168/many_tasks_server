@@ -66,4 +66,10 @@ class RewardTaskOrder extends BaseController
         $data=(new RewardTaskOrderModel())->selectRewardOrderPic();
         return self::showResCode('获取成功',$data);
     }
+
+    // 后台获取订单
+    public function getARewardTaskOrderList(){
+        $data=(new RewardTaskOrderModel())->getARewardTaskOrderList();
+        return self::showResCode('获取成功',$data);
+    }
 }

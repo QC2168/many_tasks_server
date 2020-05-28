@@ -16,7 +16,9 @@ class RewardTaskList extends Model
     }
     public function getARewardTaskList(){
         $page=request()->param('index');
-        return $this->page($page,10)->select();
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
     }
     // 添加福利任务
     public function pushRewardTask()

@@ -48,7 +48,9 @@ class OutOrderList extends Model
     // 获取提现订单  后台
     public function getAOutOrder(){
         $page=request()->param('index');
-        return $this->page($page,10)->select();
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
     }
 
     // 修改提现订单状态  后台
@@ -59,6 +61,8 @@ class OutOrderList extends Model
         $currentStatus=$this->where('orderSn',$orderSn)->value('status');
         if($currentStatus!==0)TApiException('当前订单已被修改过了',20018,200);
         $this->save(['status'=>$target],['orderSn'=>$orderSn]);
+        // 非提现成功  不赐予奖励
+        if($target!=1)return;
         //  查该提现订单的上级
         $username=$this->where('orderSn',$orderSn)->value('username');
         $f_username=get_f_username($username);
@@ -69,23 +73,23 @@ class OutOrderList extends Model
         switch ($out_count){
             case 1:
                 Assets::where(['username'=>$f_username])->setInc('wallet',get_reward_value('sub_out_one'));
-                add_wallet_details(1,get_reward_value('sub_out_one'),'下级'.$f_username.'提现奖励!');
+                add_wallet_details(1,get_reward_value('sub_out_one'),'下级'.$username.'提现奖励',$f_username);
                 break;
             case 2:
                 Assets::where(['username'=>$f_username])->setInc('wallet',get_reward_value('sub_out_two'));
-                add_wallet_details(1,get_reward_value('sub_out_two'),'下级'.$f_username.'提现奖励!');
+                add_wallet_details(1,get_reward_value('sub_out_two'),'下级'.$username.'提现奖励',$f_username);
                 break;
             case 3:
                 Assets::where(['username'=>$f_username])->setInc('wallet',get_reward_value('sub_out_three'));
-                add_wallet_details(1,get_reward_value('sub_out_three'),'下级'.$f_username.'提现奖励!');
+                add_wallet_details(1,get_reward_value('sub_out_three'),'下级'.$username.'提现奖励',$f_username);
                 break;
             case 4:
                 Assets::where(['username'=>$f_username])->setInc('wallet',get_reward_value('sub_out_four'));
-                add_wallet_details(1,get_reward_value('sub_out_four'),'下级'.$f_username.'提现奖励!');
+                add_wallet_details(1,get_reward_value('sub_out_four'),'下级'.$username.'提现奖励',$f_username);
                 break;
             case 5:
                 Assets::where(['username'=>$f_username])->setInc('wallet',get_reward_value('sub_out_five'));
-                add_wallet_details(1,get_reward_value('sub_out_five'),'下级'.$f_username.'提现奖励!');
+                add_wallet_details(1,get_reward_value('sub_out_five'),'下级'.$username.'提现奖励',$f_username);
                 break;
         }
     }

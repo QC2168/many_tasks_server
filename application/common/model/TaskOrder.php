@@ -148,4 +148,10 @@ public function selectOrderPic(){
         $order_pic=new TaskOrderPic();
    return $order_pic->where('orderSn',$orderSn)->field('pic')->select();
 }
+    public function getATaskOrderList(){
+        $page=request()->param('index');
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
+    }
 }

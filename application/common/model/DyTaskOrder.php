@@ -110,4 +110,11 @@ class DyTaskOrder extends Model
        return  $this->where(['dy_task_id'=>$dy_task_id])->hidden(['dy_task_id','id'])->select();
     }
 
+    public function getADyTaskOrderList(){
+        $page=request()->param('index');
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
+    }
+
 }

@@ -42,6 +42,11 @@ class User extends BaseController
         $data=(new FeedbackModel())->post_feedback_content();
         return self::showResCode('反馈成功',$data);
     }
+    //反馈
+    public function getUserInfoList(){
+        $data=(new UserModel())->get_user_info_list();
+        return self::showResCode('获取成功',$data);
+    }
 
     // 上传头像
     public function uploadUserPic()

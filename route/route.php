@@ -21,7 +21,12 @@ Route::group('api/:version/',function (){
     Route::get('get_reward_task_detail','api/:version.RewardTaskList/getRewardTaskDetail');
     Route::get('get_home_pic','api/:version.Info/getHomePic');
     Route::get('get_notice_bar','api/:version.Info/getNoticeBar');
-});
+})
+    ->header('Access-Control-Allow-Origin','*')
+    ->header('Access-Control-Allow-Headers','token')
+    ->header('Access-Control-Allow-Credentials', 'true')
+    ->allowCrossDomain()
+;
 
 Route::group('api/:version/',function(){
     Route::get('get_user','api/:version.User/get_user');
@@ -69,16 +74,30 @@ Route::group('api/:version/',function(){
     Route::post('recharge','api/:version.RechargeKey/recharge');
     Route::post('updateV','api/:version.Info/updateV');
     Route::post('check_version','api/:version.Info/checkVersion');
-})->middleware('ApiUserAuth');
+})
+    ->header('Access-Control-Allow-Origin','*')
+    ->header('Access-Control-Allow-Headers','token')
+    ->header('Access-Control-Allow-Credentials', 'true')
+    ->middleware('ApiUserAuth')
+    ->allowCrossDomain()
+;
 
 Route::group('api/:version/',function (){
     Route::get('get_a_task_list','api/:version.TaskList/getATaskList');
+    Route::get('get_a_task_order_list','api/:version.TaskOrder/getATaskOrderList');
+    Route::get('get_a_dy_task_order_list','api/:version.DyTaskOrder/getADyTaskOrderList');
+    Route::get('get_a_reward_task_order_list','api/:version.RewardTaskOrder/getARewardTaskOrderList');
     Route::get('get_a_out_order','api/:version.OutOrderList/getAOutOrder');
     Route::get('get_a_recharge_key','api/:version.RechargeKey/getARechargeKey');
     Route::get('wms_home_data','api/:version.Info/wmsHomeData');
+    Route::get('get_user_info_list','api/:version.User/getUserInfoList');
     Route::get('get_a_reward_task_list','api/:version.RewardTaskList/getARewardTaskList');
     Route::get('get_a_dy_task_list','api/:version.DyTaskList/getADyTaskList');
     Route::post('create_recharge_key','api/:version.RechargeKey/createRechargeKey');
     Route::post('change_a_out_order_status','api/:version.OutOrderList/changeAOutOrderStatus');
     Route::get('get_feedback_list','api/:version.Feedback/getFeedbackList');
-})->middleware('ApiAdminAuth');
+}) ->header('Access-Control-Allow-Origin','*')
+    ->header('Access-Control-Allow-Headers','token')
+    ->header('Access-Control-Allow-Credentials', 'true')
+    ->middleware('ApiAdminAuth')
+    ->allowCrossDomain();

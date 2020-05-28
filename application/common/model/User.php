@@ -172,4 +172,12 @@ class User extends Model
             'serveInfo'=>$serveInfo
         ];
     }
+    // 获取反馈list
+    public function get_user_info_list(){
+        $page=request()->param('index');
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
+
+    }
 }

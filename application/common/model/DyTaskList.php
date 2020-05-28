@@ -17,7 +17,9 @@ class DyTaskList extends Model
     public function getADyTaskList()
     {
         $page=request()->param('index');
-        return $this->page($page,10)->select();
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
     }
 
     //获取详情

@@ -15,7 +15,9 @@ class TaskList extends Model
     }
     public function getATaskList(){
         $page=request()->param('index');
-        return $this->page($page,10)->select();
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
     }
     public function getTaskDetail(){
         $param=request()->param();

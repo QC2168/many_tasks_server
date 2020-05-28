@@ -35,7 +35,7 @@ class RewardTaskOrderValidate extends BaseValidate
         'createOrder'=>['reward_task_id'],
         'getRewardTaskOrderInfo'  =>  ['orderSn'],
         'uploadTaskOrderPic'=>['pic'],
-        'placeRewardOrder'=>['orderSn','goods_url','content','pic_list'],
+        'placeRewardOrder'=>['orderSn','goods_orderSn','content','pic_list'],
         'myPushTaskOrder'=>['task_id_select'],
         'changeOrderStatus'=>['orderSn','status'],
         'selectOrderPic'=>['orderSn']

@@ -19,13 +19,14 @@ function TApiException($msg='异常', $errorCode=999, $code=400){
     throw new \app\lib\exception\BaseException(['code' =>$code, 'msg' =>$msg, 'errorCode' => $errorCode]);
 }
 function _PATH(){
-    return "http://121.42.13.36:9000/";
+    return "http://task.taskarea.top/";
 }
 // 添加到明细
-function add_wallet_details($type,$value,$msg='未设置消息'){
+
+function add_wallet_details($type,$value,$msg='未设置消息',$username=NULL){
     $WalletDetails=new \app\common\model\WalletDetails();
     $WalletDetails->create([
-        'username'=>request()->username,
+        'username'=>$username==NULL?request()->username:$username,
         'type'=>$type,
         'value'=>$value,
         'msg'=>$msg

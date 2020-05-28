@@ -20,7 +20,10 @@ class Feedback extends Model
     }
     // 获取反馈list
     public function get_feedback_list(){
-        return $this->select();
+        $page=request()->param('index');
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
 
     }
 }

@@ -17,7 +17,7 @@ class RechargeKey extends Model
             $value = $this->where(['key' => $cKey])->value('value');
             $assets = new Assets();
             $assets->where('username', request()->username)->setInc('wallet', $value);
-            $this->save(['status' => 0], ['key' => $cKey]);
+            $this->save(['status' => 0,'username'=>request()->username], ['key' => $cKey]);
             add_wallet_details(1,$value,"卡密充值");
         });
 
@@ -51,6 +51,8 @@ class RechargeKey extends Model
     // 获取所有充值key
     public function getARechargeKey(){
         $page=request()->param('index');
-        return $this->page($page,10)->select();
+        $data= $this->page($page,10)->select();
+        $row=$this->count();
+        return ['data'=>$data,'row'=>$row];
     }
 }
