@@ -51,7 +51,9 @@ class DyTaskOrder extends Model
             $status = request()->param('status');
             // 查询当前是不是与目标状态一样
             $currentOrderStatus = $this->where('orderSn', $orderSn)->value('status');
+            $orderUser = $this->where('orderSn', $orderSn)->value('username');
             if ($status == $currentOrderStatus) return;
+            // 修改订单状态
             $save = $this->save(['status' => $status], ['orderSn' => $orderSn]);
 
 // 如果是 完成  获取价格  添加到兼职用户
@@ -63,11 +65,11 @@ class DyTaskOrder extends Model
                 $price = DyTaskList::where('dy_task_id', $dy_task_id)->value('price');
                 // 添加余额
                 $assets = new Assets();
-                $add = $assets->where('username', request()->username)->setInc('wallet', $price);
-                add_wallet_details(1,$price,"完成抖音任务");
+                $add = $assets->where('username', $orderUser)->setInc('wallet', $price);
+                add_wallet_details(1,$price,"完成抖音任务",$orderUser);
                 // 查找上级
                 $User = new User();
-                $f_username = $User->where(['username' => request()->username])->value('f_username');
+                $f_username = $User->where(['username' =>$orderUser])->value('f_username');
                 if (empty($f_username)) {
                     // 如果没有上级就不用奖励了
                     return;
@@ -77,7 +79,7 @@ class DyTaskOrder extends Model
                 $r = $team_reward->where(['type' => 'dy_task_reward_one'])->value('value');
                 $add_reward = $price * $r;
                 $assets->where(['username' => $f_username])->setInc('wallet', $add_reward);
-                add_wallet_details(1,$add_reward,"一级下级".request()->username."完成抖音任务奖励");
+                add_wallet_details(1,$add_reward,"一级下级".$orderUser."完成抖音任务奖励",$f_username);
                 // 获取上级的上级
                 $f_username_f_username = $User->where(['username' => $f_username])->value('f_username');
                 if (empty($f_username_f_username)) {
@@ -87,7 +89,7 @@ class DyTaskOrder extends Model
                 $r2 = $team_reward->where(['type' => 'dy_task_reward_two'])->value('value');
                 $add_reward2 = $price * $r2;
                 $assets->where(['username' => $f_username_f_username])->setInc('wallet', $add_reward2);
-                add_wallet_details(1,$add_reward2,"一级下级".request()->username."完成抖音任务奖励");
+                add_wallet_details(1,$add_reward2,"一级下级".$orderUser."完成抖音任务奖励",$f_username);
             }
             if ($status == 2) {
                 // 修改为完成

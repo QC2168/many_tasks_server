@@ -28,9 +28,17 @@ class BaseValidate extends Validate
         }
         return true;
     }
+    protected function isUserId($value, $rule = '', $data = '', $field = '')
+    {
+        if (\app\common\model\User::field('id')->where('id', $value)->find()) {
+            return true;
+        }
+        return "NOT USER ID";
+    }
 
     protected function istenfold($value, $rule = '', $data = '', $field = '')
     {
+
         if (($value % 10) != 0) {
             return "金额有误";
         }

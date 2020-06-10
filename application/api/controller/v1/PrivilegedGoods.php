@@ -29,4 +29,11 @@ class PrivilegedGoods extends BaseController
         return self::showResCode('获取成功',$price);
     }
 
+    // 修改商品数据
+    public function changePrivilegedGood(){
+        (new PrivilegedGoodsValidate())->goCheck('changePrivilegedGood');
+        $price=(new PrivilegedGoodsModel())->changePrivilegedGood();
+        return self::showResCodeWithOutData('修改生效');
+    }
+
 }

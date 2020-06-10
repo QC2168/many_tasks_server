@@ -42,7 +42,7 @@ class User extends BaseController
         $data=(new FeedbackModel())->post_feedback_content();
         return self::showResCode('反馈成功',$data);
     }
-    //反馈
+    // 获取用户列表
     public function getUserInfoList(){
         $data=(new UserModel())->get_user_info_list();
         return self::showResCode('获取成功',$data);
@@ -57,5 +57,20 @@ class User extends BaseController
         if ($info == false) TApiException('图片上传失败', 20009, 200);
         $getSaveName = str_replace("\\", "/", $info->getSaveName());
         return self::showResCode('上传成功','/static/UserPic/'.$getSaveName);
+    }
+
+    // 封锁用户状态
+ public function changeUserStatus(){
+
+     (new UserValidate())->goCheck('changeUserStatus');
+     (new UserModel())->changeUserStatus();
+     return self::showResCodeWithOutData('操作成功');
+ }
+
+ // 修改密码
+    public function changePassword(){
+        (new UserValidate())->goCheck('changePassword');
+        (new UserModel())->changePassword();
+        return self::showResCodeWithOutData('操作成功');
     }
 }

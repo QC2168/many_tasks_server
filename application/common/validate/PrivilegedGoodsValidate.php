@@ -14,7 +14,14 @@ class PrivilegedGoodsValidate extends BaseValidate
      */	
 	protected $rule = [
 	    'type'=>'require|number|between:1,3',
-	    'name'=>'require|typeName'
+	    'name'=>'require|typeName',
+	    'out'=>'require',
+	    'push_task'=>'require',
+	    'push_dy_task'=>'require',
+	    'term'=>'require',
+	    'fans'=>'require',
+	    'price'=>'require',
+	    'level'=>'require',
     ];
     
     /**
@@ -27,6 +34,7 @@ class PrivilegedGoodsValidate extends BaseValidate
     protected $scene=[
         'buyGoods'=>'type',
         'getServePrice'=>'name',
+        'changePrivilegedGood'=>'level,out,push_task,push_dy_task,term,fans,price',
     ];
 
 }

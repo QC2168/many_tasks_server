@@ -12,7 +12,22 @@ class PrivilegedGoods extends Model
 
     //获取全部VIP
 public function getPrivilegedGoods(){
-    return $this->where('status',1)->hidden(['id','status'])->select();
+    return $this->where('status',1)->hidden(['id','status','push_reward_task'])->select();
+}
+//修改商品数据
+public function changePrivilegedGood(){
+    $param=request()->param();
+    $this->save([
+        'out'=>$param['out'],
+        'push_task'=>$param['push_task'],
+        'push_dy_task'=>$param['push_dy_task'],
+        'term'=>$param['term'],
+        'fans'=>$param['fans'],
+        'price'=>$param['price'],
+    ],[
+        'level'=>$param['level']
+    ]);
+    return true;
 }
 // 购买VIP
 public function buyPrivilegedGoods(){

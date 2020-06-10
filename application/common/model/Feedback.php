@@ -26,4 +26,11 @@ class Feedback extends Model
         return ['data'=>$data,'row'=>$row];
 
     }
+    // 处理反馈
+    public function change_feedback_data(){
+        $id=request()->param('id');
+        $this->save(['status'=>1],['id'=>$id]);
+        return true;
+
+    }
 }

@@ -35,7 +35,7 @@ class Sign extends Model
                 $this->where(['username'=>request()->username])->setInc('continued',1);
                 // 签到福利
                 $assets=new Assets();
-                $addPrice=(random_int(2,5));
+                $addPrice=(random_int(2,5)*0.3);
                 $assets->where(['username'=>request()->username])->setInc('wallet',$addPrice);
                 $signLog=new SignLog();
                 $signLog->create([

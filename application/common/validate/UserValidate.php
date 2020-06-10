@@ -13,13 +13,14 @@ class UserValidate extends BaseValidate
      * @var array
      */	
 	protected $rule = [
-	    'username'=>'require|length:1,10',
-	    'password'=>'require|length:4,16',
-	    'rpassword'=>'require|length:4,16',
+	    'username'=>'require|chsDash|length:1,10',
+	    'password'=>'require|chsDash|length:4,16',
+	    'rpassword'=>'require|chsDash|length:4,16',
 	    'phone'=>'require|mobile|regPhone',
         'code'=>'alphaNum|length:1,6',
         'feedback_content'=>'require',
-        'user_pic'=>'file'
+        'user_pic'=>'file',
+        'id'=>'require|number|isUserId',
 
     ];
     
@@ -29,7 +30,10 @@ class UserValidate extends BaseValidate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'username.chsDash'=>"用户名规则不正确",
+        'password.chsDash'=>"用户名规则不正确",
+    ];
 
     //场景
     protected $scene=[
@@ -40,5 +44,7 @@ class UserValidate extends BaseValidate
         //反馈
         'feedback'=>['feedback_content'],
         'uploadUserPic'=>['user_pic'],
+        'changeUserStatus'=>['id'],
+        'changePassword'=>['rpassword'],
     ];
 }

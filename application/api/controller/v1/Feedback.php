@@ -13,4 +13,9 @@ class Feedback extends BaseController
         $data=(new FeedbackModel())->get_feedback_list();
         return self::showResCode('获取成功',$data);
     }
+    //处理反馈
+    public function changeFeedbackData(){
+        (new FeedbackModel())->change_feedback_data();
+        return self::showResCodeWithOutData('处理成功');
+    }
 }

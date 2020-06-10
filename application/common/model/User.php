@@ -158,7 +158,7 @@ class User extends Model
             '网站文档目录' => $_SERVER["DOCUMENT_ROOT"],
             'PHP版本' => PHP_VERSION,
             '服务器域名/IP' => $_SERVER['SERVER_NAME'] . ' [ ' . gethostbyname($_SERVER['SERVER_NAME']) . ' ]',
-            '用户的IP地址' => $_SERVER['REMOTE_ADDR'],
+            '访问IP地址' => $_SERVER['REMOTE_ADDR'],
             '剩余空间' => round((disk_free_space(".") / (1024 * 1024)), 2) . 'M',
         ];
         $outOrder=['sum'=>$AllOutAmount,'today'=>$toDayAllOrderCount,'title'=>'提现订单MODUL'];
@@ -179,5 +179,22 @@ class User extends Model
         $row=$this->count();
         return ['data'=>$data,'row'=>$row];
 
+    }
+    // 封锁用户状态
+    public function changeUserStatus(){
+        $_id=request()->param('id');
+        // 获取当前用户状态 如果是0 提示已经操作
+        $currentStatus=$this->where('id',$_id)->value('status');
+        if($currentStatus==0)return TApiException('该用户已经被封锁',20019,200);
+        $this->save(['status'=>0],['id'=>$_id]);
+        return true;
+
+    }
+
+    // 修改密码
+    public function changePassword(){
+        $rpassword=request()->param('rpassword');
+        $this->save(['password'=>password_hash($rpassword, PASSWORD_DEFAULT)],['username'=>request()->username]);
+        return true;
     }
 }

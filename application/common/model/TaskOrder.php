@@ -52,7 +52,7 @@ class TaskOrder extends Model
         $picList = request()->param('pic_list');
          $currentOrderStatus=$this->where('orderSn',$orderSn)->value('status');
        if($currentOrderStatus!=4) TApiException('该悬赏任务订单已经是待审核状态',20018,200);
-$save=$this->save(['status'  => 0],['orderSn' => $orderSn]);
+$save=$this->save(['status'  => 0,'content'=>$content],['orderSn' => $orderSn]);
 //提交图片
         $task_order_pic=new TaskOrderPic();
         // 判断有没有图片列表
@@ -77,7 +77,9 @@ $save=$this->save(['status'  => 0],['orderSn' => $orderSn]);
             $status = request()->param('status');
         // 查询当前是不是与目标状态一样
         $currentOrderStatus=$this->where('orderSn',$orderSn)->value('status');
-        if($status==$currentOrderStatus)return;
+           $orderUser = $this->where('orderSn', $orderSn)->value('username');
+
+           if($status==$currentOrderStatus)return;
 $save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
 
 // 如果是 完成  获取价格  添加到兼职用户
@@ -89,11 +91,11 @@ $save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
             $price=TaskList::where('task_id',$task_id)->value('price');
             // 添加余额
             $assets=new Assets();
-            $add=$assets->where('username',request()->username)->setInc('wallet',$price);
-            add_wallet_details(1,$price,'完成悬赏任务奖励');
+            $add=$assets->where('username',$orderUser)->setInc('wallet',$price);
+            add_wallet_details(1,$price,'完成悬赏任务奖励',$orderUser);
             // 查找上级
             $User=new User();
-            $f_username=$User->where(['username'=>request()->username])->value('f_username');
+            $f_username=$User->where(['username'=>$orderUser])->value('f_username');
             if(empty($f_username)){
                 // 如果没有上级就不用奖励了
                 return;
@@ -103,7 +105,7 @@ $save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
             $r=$team_reward->where(['type'=>'task_reward_one'])->value('value');
          $add_reward=$price*$r;
             $assets->where(['username'=>$f_username])->setInc('wallet',$add_reward);
-            add_wallet_details(1,$add_reward,"一级下级".request()->username."完成悬赏任务奖励");
+            add_wallet_details(1,$add_reward,"一级下级".$orderUser."完成悬赏任务奖励",$f_username);
             // 获取上级的上级
             $f_username_f_username=$User->where(['username'=>$f_username])->value('f_username');
             if(empty($f_username_f_username)){
@@ -112,8 +114,8 @@ $save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
             }
             $r2=$team_reward->where(['type'=>'task_reward_two'])->value('value');
             $add_reward2=$price*$r2;
-            $assets->where(['username'=>$f_username_f_username])->setInc('wallet',$add_reward2);
-            add_wallet_details(1,$add_reward2,"二级下级".request()->username."完成悬赏任务奖励");
+            $assets->where(['username'=>$f_username_f_username])->setInc('wallet',$add_reward2,$f_username);
+            add_wallet_details(1,$add_reward2,"二级下级".$orderUser."完成悬赏任务奖励");
         } if($status==3){
             // 修改为完成
             // 获取任务ID
