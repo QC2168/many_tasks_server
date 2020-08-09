@@ -72,4 +72,10 @@ class TaskOrder extends BaseController
         $data=(new TaskOrderModel())->getATaskOrderList();
         return self::showResCode('获取成功',$data);
     }
+    // 后台  获取该订单详细信息
+    public function getTaskOrderDetail(){
+        $data=(new TaskOrderModel())->getTaskOrderDetail();
+        return self::showResCode('获取成功',$data);
+
+    }
 }

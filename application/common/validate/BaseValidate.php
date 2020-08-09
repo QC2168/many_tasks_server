@@ -80,6 +80,14 @@ class BaseValidate extends Validate
         return "没有该XS任务";
 
     }
+    protected function isHbId($value, $rule = '', $data = '', $field = '')
+    {
+        if (\app\common\model\HbAreaList::field('hb_id')->where(['hb_id' => $value])->where('show' ,'<>',0)->find()) {
+            return true;
+        }
+        return "没有找到这个红包";
+
+    }
 
     protected function isTaskIdSelect($value, $rule = '', $data = '', $field = '')
     {

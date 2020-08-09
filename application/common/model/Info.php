@@ -18,6 +18,7 @@ class Info extends Model
     public function getNoticeBar(){
         return $this->where('key','notice_bar')->value('value');
     }
+
     // 设置首页通知栏数据
     public function setNoticeBar(){
         $message=request()->param('message');

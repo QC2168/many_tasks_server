@@ -43,7 +43,7 @@ class UserValidate extends BaseValidate
         'login'=>['username','password'],
         //反馈
         'feedback'=>['feedback_content'],
-        'uploadUserPic'=>['user_pic'],
+        'uploadUserPic'=>['user_pic','username'],
         'changeUserStatus'=>['id'],
         'changePassword'=>['rpassword'],
     ];

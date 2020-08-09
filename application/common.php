@@ -94,3 +94,22 @@ function get_f_username($username){
 function get_reward_value($type){
     return \app\common\model\TeamReward::where(['type'=>$type])->value('value');
 }
+
+function randBonus($bonus_total=0, $bonus_count=3, $bonus_type=1){
+    $bonus_items = array(); // 将要瓜分的结果
+    $bonus_balance = $bonus_total; // 每次分完之后的余额
+    $bonus_avg = number_format($bonus_total/$bonus_count, 2); // 平均每个红包多少钱
+    $i = 0;
+    while($i<$bonus_count){
+        if($i<$bonus_count-1){
+            $rand = $bonus_type?(rand(1, $bonus_balance*100-1)/100):$bonus_avg; // 根据红包类型计算当前红包的金额
+            $bonus_items[] = $rand;
+            $bonus_balance -= $rand;
+        }else{
+            $bonus_items[] = $bonus_balance; // 最后一个红包直接承包最后所有的金额，保证发出的总金额正确
+        }
+        $i++;
+    }
+    return $bonus_items;
+}
+

@@ -41,4 +41,26 @@ class DyTaskOrder extends BaseController
         $data=(new DyTaskOrderModel())->getADyTaskOrderList();
         return self::showResCode('获取成功',$data);
     }
+    // 后台  获取该订单详细信息
+    public function getDyTaskOrderDetail(){
+        $data=(new DyTaskOrderModel())->getDyTaskOrderDetail();
+        return self::showResCode('获取成功',$data);
+
+    }
+    // 查询订单提交的图片
+    public function selectOrderPic(){
+        (new DyTaskOrderValidate())->goCheck('selectOrderPic');
+        $data=(new DyTaskOrderModel())->selectOrderPic();
+        return self::showResCode('获取成功',$data);
+    }
+    // 上传提交抖音任务截图接口
+    public function uploadDyTaskOrderPic()
+    {
+        (new DyTaskOrderValidate())->goCheck('uploadDyTaskOrderPic');
+        $pic = request()->file('pic');
+        $info = $pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskOrderPic');
+        if ($info == false) TApiException('图片上传失败', 20009, 200);
+        $getSaveName = str_replace("\\", "/", $info->getSaveName());
+        return self::showResCode('上传成功','/static/DyTaskOrderPic/'.$getSaveName);
+    }
 }

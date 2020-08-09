@@ -13,8 +13,10 @@ class DyTaskOrder extends Model
     }
     public function createDyTaskOrder()
     {
+        return Db::transaction(function () {
         $dy_task_id = request()->param('dy_task_id');
-        $check_pic = request()->file('check_pic');
+        $picList = request()->param('pic_list');
+        $orderSn=create_OrderSn();
         // 判断是不是已经领取过了该任务
         // 查询该用户历史订单
         $historicalOrder=$this->where(['dy_task_id'=>$dy_task_id,'username'=>request()->username])->find();
@@ -22,22 +24,30 @@ class DyTaskOrder extends Model
         if($historicalOrder){
             TApiException('你已经申请过该任务了!',20017, 200);
         }
-        $info = $check_pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskOrderPic');
-        if($info==false)TApiException('图片上传失败',20009, 200);
         // 判断有无名额
         $quota=DyTaskList::where('dy_task_id',$dy_task_id)->value('remaining_quota');
         if($quota<=0) TApiException('任务名次没有啦!',20010, 200);
         // 名次减一
         DyTaskList::where('dy_task_id',$dy_task_id)->setDec('remaining_quota',1);
-        $getSaveName = str_replace("\\", "/", $info->getSaveName());
     $this->create([
            'dy_task_id'=>$dy_task_id,
             'username'=>request()->username,
-            'check_pic'=>'/static/DyTaskOrderPic/' . $getSaveName,
-            'orderSn'=>create_OrderSn(),
+            'orderSn'=>$orderSn,
             'status'=>0,
         ]);
-        return;
+        //提交图片
+        $task_order_pic=new DyTaskOrderPic();
+        // 判断有没有图片列表
+        $task_order_pic_list=json_decode($picList,true);
+        if(empty($task_order_pic_list)) return true;
+        // 创建图片
+        foreach ($task_order_pic_list as $key => $value){
+            $task_order_pic->create([
+                'orderSn'=>$orderSn,
+                'pic'=>$value
+            ]);
+        }});
+
     }
 
     public function myDyTaskOrder(){
@@ -52,6 +62,7 @@ class DyTaskOrder extends Model
             // 查询当前是不是与目标状态一样
             $currentOrderStatus = $this->where('orderSn', $orderSn)->value('status');
             $orderUser = $this->where('orderSn', $orderSn)->value('username');
+            if($currentOrderStatus!=0)return TApiException('该订单已经被操作过了',20010,200);
             if ($status == $currentOrderStatus) return;
             // 修改订单状态
             $save = $this->save(['status' => $status], ['orderSn' => $orderSn]);
@@ -118,5 +129,15 @@ class DyTaskOrder extends Model
         $row=$this->count();
         return ['data'=>$data,'row'=>$row];
     }
-
+    // 后台  获取该订单详细信息
+    public function  getDyTaskOrderDetail(){
+        $orderSn=request()->param('orderSn');
+        return $this->with('DyTaskList')->where(['orderSn'=>$orderSn])->find();
+    }
+    // 查看任务订单图片
+    public function selectOrderPic(){
+        $orderSn=request()->param('orderSn');
+        $order_pic=new DyTaskOrderPic();
+        return $order_pic->where('orderSn',$orderSn)->field('pic')->select();
+    }
 }

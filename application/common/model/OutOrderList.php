@@ -37,6 +37,9 @@ class OutOrderList extends Model
             'final_amount' => $amount-($amount*$servePrice)
         ]);
         add_wallet_details(2,$amount,"账户提现");
+        // 插入通知
+        $HbAreaNoticeBar=new HbAreaNoticeBar();
+        $HbAreaNoticeBar->save(['username'=>request()->username,'status'=>1,'content'=>'用户 '.substr(request()->username,0,2).'*** 申请提现'.$amount.'元']);
         return $orderSn;
     }
 

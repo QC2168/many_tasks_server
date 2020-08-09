@@ -78,7 +78,7 @@ $save=$this->save(['status'  => 0,'content'=>$content],['orderSn' => $orderSn]);
         // 查询当前是不是与目标状态一样
         $currentOrderStatus=$this->where('orderSn',$orderSn)->value('status');
            $orderUser = $this->where('orderSn', $orderSn)->value('username');
-
+          if($currentOrderStatus!=0)return TApiException('该订单已经被操作过了',20010,200);
            if($status==$currentOrderStatus)return;
 $save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
 
@@ -116,23 +116,15 @@ $save=$this->save(['status'  => $status],['orderSn' => $orderSn]);
             $add_reward2=$price*$r2;
             $assets->where(['username'=>$f_username_f_username])->setInc('wallet',$add_reward2,$f_username);
             add_wallet_details(1,$add_reward2,"二级下级".$orderUser."完成悬赏任务奖励");
-        } if($status==3){
+        } if($status==3||$status==5||$status==2){
             // 修改为完成
             // 获取任务ID
             $task_id=$this->where('orderSn',$orderSn)->value('task_id');
             // 退回名额
             $add=TaskList::where('task_id',$task_id)->setInc('remaining_quota', 1);
         return;
-        }if($status==2){
-            // 修改为完成
-            // 获取任务ID
-            $task_id=$this->where('orderSn',$orderSn)->value('task_id');
-            // 退回名额
-            $add=TaskList::where('task_id',$task_id)->setInc('remaining_quota', 1);
-          return;
-        }
-        else{
-            return;
+        }else{
+            return true;
         }
 
         });
@@ -155,5 +147,10 @@ public function selectOrderPic(){
         $data= $this->page($page,10)->select();
         $row=$this->count();
         return ['data'=>$data,'row'=>$row];
+    }
+    // 后台  获取该订单详细信息
+    public function  getTaskOrderDetail(){
+        $orderSn=request()->param('orderSn');
+        return $this->with('TaskList')->where(['orderSn'=>$orderSn])->find();
     }
 }

@@ -7,6 +7,7 @@ use app\lib\exception\BaseException;
 use think\Db;
 use think\facade\Cache;
 use think\Model;
+use think\Request;
 
 class User extends Model
 {
@@ -15,6 +16,15 @@ class User extends Model
     public function privilege(){
         return $this->hasOne('Privilege','username','username');
     }
+//uploadUserPic
+public function uploadUserPic(){
+    $pic = request()->file('user_pic');
+    $info = $pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/UserPic');
+    if ($info == false) TApiException('图片上传失败', 20009, 200);
+    $getSaveName = str_replace("\\", "/", $info->getSaveName());
+    $this->save(['user_pic'=>'/static/UserPic/'.$getSaveName],['username'=>request()->username]);
+    return true;
+}
     //注册
     public function register()
     {
@@ -57,6 +67,15 @@ class User extends Model
                 'continued' =>  0,
                 'last_time' =>0,
             ]);
+
+            // 有上级才有奖励
+            if(!empty($fUsername)){
+                $Assets->where('username',request()->username)->setInc('wallet',1 );
+                add_wallet_details(1,1,"新人福利");
+                $Assets->where('username',$fUsername)->setInc('wallet',.3 );
+                add_wallet_details(1,.3,"邀请奖励-新用户:".request()->username);
+            }
+
         });
         return true;
     }

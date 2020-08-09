@@ -9,6 +9,7 @@ use think\Cache;
 use think\Controller;
 use think\Request;
 use app\common\model\HomePagePic as HomePagePicModel;
+use app\common\model\HbAreaNoticeBar as HbAreaNoticeBarModel;
 use app\common\model\Info as InfoModel;
 use app\common\model\User as UserModel;
 
@@ -23,6 +24,11 @@ class Info extends BaseController
     // 获取NoticeBar
     public function getNoticeBar(){
         $data=(new InfoModel())->getNoticeBar();
+        return self::showResCode('获取成功',$data);
+    }
+    // 获取NoticeBar
+    public function getHbAreaNoticeBar(){
+        $data=(new HbAreaNoticeBarModel())->getHbAreaNoticeBar();
         return self::showResCode('获取成功',$data);
     }
     // 设置NoticeBar

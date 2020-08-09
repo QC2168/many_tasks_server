@@ -17,7 +17,9 @@ class DyTaskOrderValidate extends BaseValidate
 	    'dy_task_id_select'=>'number|require|isDyTaskIdSelect',
 	    'check_pic'=>'file',
         'orderSn'=>'require|isDyTaskOrderSn',
-        'status'=>'between:1,5'
+        'pic'=>'file',
+        'status'=>'between:1,5',
+           'pic_list'=>'require|isArr',
     ];
     
     /**
@@ -28,8 +30,11 @@ class DyTaskOrderValidate extends BaseValidate
      */	
     protected $message = [];
     protected $scene=[
-      'createDyOrder'=>['dy_task_id','check_pic'],
+      'createDyOrder'=>['dy_task_id','pic_list'],
+        'uploadDyTaskOrderPic'=>['pic'],
         'changeDyOrderStatus'=>['orderSn','status'],
         'myPushDyTaskOrder'=>['dy_task_id_select'],
+        'myPushDyTaskOrder'=>['dy_task_id_select'],
+        'selectOrderPic'=>['orderSn']
     ];
 }

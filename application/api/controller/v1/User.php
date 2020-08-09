@@ -52,11 +52,8 @@ class User extends BaseController
     public function uploadUserPic()
     {
         (new UserValidate())->goCheck('uploadUserPic');
-        $pic = request()->file('user_pic');
-        $info = $pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/UserPic');
-        if ($info == false) TApiException('图片上传失败', 20009, 200);
-        $getSaveName = str_replace("\\", "/", $info->getSaveName());
-        return self::showResCode('上传成功','/static/UserPic/'.$getSaveName);
+        (new UserModel())->uploadUserPic();
+return self::showResCodeWithOutData('头像修改成功');
     }
 
     // 封锁用户状态
