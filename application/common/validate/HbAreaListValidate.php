@@ -40,5 +40,7 @@ class HbAreaListValidate extends BaseValidate
 'getHbDetailCommentList'=>['hb_id'],
         'uploadHbDetailPic'=>['pic'],
 
+        'deleteHb'  =>  ['hb_id'],
+
     ];
 }

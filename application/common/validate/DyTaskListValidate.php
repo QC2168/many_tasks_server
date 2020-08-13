@@ -19,7 +19,7 @@ class DyTaskListValidate extends BaseValidate
         'tag'=>'require',
         'content'=>'require',
         'price'=>'require',
-        'quota'=>'require|number|between:1,100',
+        'quota'=>'require|number|between:1,1000',
         'dy_task_id'=>'require|number',
     ];
     

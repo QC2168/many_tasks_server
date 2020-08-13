@@ -28,7 +28,7 @@ class DyTaskList extends Model
         $param = request()->param();
         // 判断这个任务是否隐藏/下架了
         $current_show = $this->where('dy_task_id', $param['dy_task_id'])->value('show');
-        if ($current_show == 0) TApiException('任务被删除了，无法查看', 20006, 200);
+        if ($current_show == 0) TApiException('任务已经被删除了', 20006, 200);
         return $this->where('dy_task_id', $param['dy_task_id'])->hidden(['quota', 'create_time', 'dy_task_id', 'show'])->find();
     }
 
@@ -84,7 +84,7 @@ class DyTaskList extends Model
         // 获取状态
         $isdelete = $this->where('dy_task_id', $dy_task_id)->value('show');
         // 该任务已经被删除了
-        if ($isdelete == 0) TApiException('任务被删除了，无法查看', 20006, 200);
+        if ($isdelete == 0) TApiException('任务已经被删除了', 20006, 200);
         // 修改任务状态
         $this->where('dy_task_id', $dy_task_id)->update(['show' => 0]);
         // 计算退回的金额

@@ -12,8 +12,9 @@ class Info extends Model
 }
     // 获取首页通知信息框
     public function getMessage(){
-
+        return $this->where('key','message')->value('value');
     }
+
 // 获取首页通知栏数据
     public function getNoticeBar(){
         return $this->where('key','notice_bar')->value('value');

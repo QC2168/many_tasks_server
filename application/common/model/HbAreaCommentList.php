@@ -13,6 +13,20 @@ class HbAreaCommentList extends Model
     }
     public function commitComment(){
         $param = request()->param();
+        // 判断之前是否已经领取过红包
+        // 获取列表数据
+        $curentList=$this->where(['hb_id'=>$param['hb_id'],'username'=>request()->username])->find();
+        // 判断之前是否已经领取过红包
+        if($curentList!==null){
+            //创建评论
+            $hb=$this->create([
+                'username' => request()->username,
+                'content' => $param['content'],
+                'show'=>1,
+                'get_hb'=>123,
+                'hb_id'=>$param['hb_id'],
+            ]);
+            return "评论成功";}
         //创建评论
         $hb=$this->create([
             'username' => request()->username,
@@ -24,19 +38,16 @@ class HbAreaCommentList extends Model
         // 插入通知
         $HbAreaNoticeBar=new HbAreaNoticeBar();
         $HbAreaNoticeBar->save(['username'=>request()->username,'status'=>1,'content'=>'用户 '.substr(request()->username,0,2).'*** 获得评论红包']);
-        // 判断之前是否已经领取过红包
-        // 获取列表数据
-        $curentList=$this->where(['hb_id'=>$param['hb_id'],'username'=>request()->username])->find();
-        // 判断之前是否已经领取过红包
-        if($curentList!==null) return "评论成功";
         // 查，这个评论是不是免费的
         $HbAreaList=new HbAreaList();
         $_amount=$HbAreaList->where('hb_id',$param['hb_id'])->value('hb_amount');
         if($_amount==0){
-            $money=(random_int(1,3)*.1);
+            $money=round(random_int(1,3)*.1,2);
             Assets::where('username',request()->username)->setInc('wallet',$money );
+            //名额减一
+            $HbAreaList->where('hb_id',$param['hb_id'])->setDec('remaining_quota', 1);
             add_wallet_details(1,$money,"悬赏红包");
-            return $money;
+            return '评论成功,本次获得红包'.$money.'元';
         }else{
             // 不是免费红包
             // 取剩下的红包金额

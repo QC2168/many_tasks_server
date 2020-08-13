@@ -93,7 +93,7 @@ class RewardTaskList extends Model
         // 获取状态
         $isDelete=$this->where('task_id',$reward_task_id)->value('show');
         // 该任务已经被删除了
-        if($isDelete==0) TApiException('任务被删除了，无法查看',20006, 200);
+        if($isDelete==0) TApiException('任务已经被删除了',20006, 200);
         // 修改任务状态
         $this->where('reward_task_id',$reward_task_id)->update(['show'=>0]);
         // 计算退回的金额
@@ -114,7 +114,7 @@ class RewardTaskList extends Model
         $param=request()->param();
         // 判断这个任务是否隐藏/下架了
         $current_show=$this->where('reward_task_id',$param['reward_task_id'])->value('show');
-        if (!$current_show) TApiException('任务被删除了，无法查看',20006, 200);
+        if (!$current_show) TApiException('任务已经被删除了',20006, 200);
 //        return $this->with('TaskStepPic')->where('task_id',$param['task_id'])->hidden(['quota','create_time','task_id','show'])->find();
         $hide=[
             'sn',

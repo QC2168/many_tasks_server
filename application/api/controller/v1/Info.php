@@ -26,6 +26,11 @@ class Info extends BaseController
         $data=(new InfoModel())->getNoticeBar();
         return self::showResCode('获取成功',$data);
     }
+    // 获取Message
+    public function getMessage(){
+        $data=(new InfoModel())->getMessage();
+        return self::showResCode('获取成功',$data);
+    }
     // 获取NoticeBar
     public function getHbAreaNoticeBar(){
         $data=(new HbAreaNoticeBarModel())->getHbAreaNoticeBar();

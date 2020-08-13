@@ -40,6 +40,16 @@ class HbAreaList extends BaseController
         $data=(new HbAreaCommentListModel())->getHbDetailCommentList();
         return self::showResCode('获取成功',$data);
     }
+    public function myHb(){
+        $data=(new HbAreaListModel())->myHb();
+        return self::showResCode('获取成功',$data);
+    }
+    // 删除广告
+    public function deleteHb(){
+        (new HbAreaListValidate())->goCheck('deleteHb');
+        $data=(new HbAreaListModel())->deleteHb();
+        return self::showResCode('删除成功',$data);
+    }
     // 上传红包图片图接口
     public function uploadHbDetailPic()
     {

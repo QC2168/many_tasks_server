@@ -17,7 +17,7 @@ class TaskListValidate extends BaseValidate
 	    'tag'=>'require',
 	    'content'=>'require',
 	    'price'=>'require',
-	    'quota'=>'require|number|between:1,100',
+	    'quota'=>'require|number|between:1,1000',
 	    'task_id'=>'require|number',
 	    'task_step_list'=>'require|isArr',
         'pic'=>'file'
