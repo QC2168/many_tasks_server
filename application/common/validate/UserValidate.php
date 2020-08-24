@@ -13,9 +13,9 @@ class UserValidate extends BaseValidate
      * @var array
      */	
 	protected $rule = [
-	    'username'=>'require|chsDash|length:1,10',
-	    'password'=>'require|chsDash|length:4,16',
-	    'rpassword'=>'require|chsDash|length:4,16',
+	    'username'=>'require|chsAlphaNum|length:1,10',
+	    'password'=>'require|chsAlphaNum|length:4,16',
+	    'rpassword'=>'require|chsAlphaNum|length:4,16',
 	    'phone'=>'require|mobile|regPhone',
         'code'=>'alphaNum|length:1,6',
         'feedback_content'=>'require',
@@ -32,7 +32,7 @@ class UserValidate extends BaseValidate
      */	
     protected $message = [
         'username.chsDash'=>"用户名规则不正确",
-        'password.chsDash'=>"用户名规则不正确",
+        'password.chsDash'=>"密码规则不正确",
     ];
 
     //场景

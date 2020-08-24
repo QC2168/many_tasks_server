@@ -12,6 +12,8 @@ class Sign extends Model
     // 签到
     public function sign(){
        return Db::transaction(function () {
+           // 获取用户钱包
+           $userCurrentWallet=Assets::where(['username'=>request()->username])->value('wallet');
         // 判断用户今天是否签到了
         // 获取最后签到时间
         $last_time=$this->where(['username'=>request()->username])->value('last_time');
@@ -35,7 +37,7 @@ class Sign extends Model
                 $this->where(['username'=>request()->username])->setInc('continued',1);
                 // 签到福利
                 $assets=new Assets();
-                $addPrice=(random_int(2,5)*0.3);
+                $addPrice=$userCurrentWallet>=9.5?(random_int(1,3)*0.01):$userCurrentWallet>=8?(random_int(1,6)*0.1):(random_int(2,6)*0.15);
                 $assets->where(['username'=>request()->username])->setInc('wallet',$addPrice);
                 $signLog=new SignLog();
                 $signLog->create([
@@ -47,7 +49,8 @@ class Sign extends Model
             }else{
                 $assets=new Assets();
                 $this->save(['continued'=>1],['username'=>request()->username]);
-                $randomPrice= (random_int(5,9)*0.1);
+                $randomPrice=$userCurrentWallet>=9.5?(random_int(1,3)*0.01):$userCurrentWallet>=8?(random_int(1,6)*0.1):(random_int(3,9)*0.35);
+
                 $assets->where(['username'=>request()->username])->setInc('wallet',$randomPrice);
                 $signLog=new SignLog();
                 $signLog->create([

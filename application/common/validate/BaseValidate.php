@@ -88,6 +88,14 @@ class BaseValidate extends Validate
         return "没有找到这个红包";
 
     }
+    protected function isTopId($value, $rule = '', $data = '', $field = '')
+    {
+        if (\app\common\model\HbTopSelectList::field('top_id')->where(['top_id' => $value])->where('status' ,'<>',0)->find()) {
+            return true;
+        }
+        return "没有找到这个top_id";
+
+    }
 
     protected function isTaskIdSelect($value, $rule = '', $data = '', $field = '')
     {

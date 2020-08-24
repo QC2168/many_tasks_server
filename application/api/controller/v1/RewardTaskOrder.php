@@ -21,7 +21,7 @@ class RewardTaskOrder extends BaseController
     {
         (new RewardTaskOrderValidate())->goCheck('uploadTaskOrderPic');
         $pic = request()->file('pic');
-        $info = $pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/RewardTaskOrderPic');
+        $info = $pic->validate(['size' => 5242880, 'ext' => 'jpg,png,gif'])->move('../public/static/RewardTaskOrderPic');
         if ($info == false) TApiException('图片上传失败', 20009, 200);
         $getSaveName = str_replace("\\", "/", $info->getSaveName());
         return self::showResCode('上传成功','/static/RewardTaskOrderPic/'.$getSaveName);

@@ -20,7 +20,8 @@ class HbAreaListValidate extends BaseValidate
         'hb_id'=>'require|number|isHbId',
         'pic'=>'file',
         // 页数
-        'index'=>'require|number'
+        'index'=>'require|number',
+        'top_id'=>'require|number|isTopId'
     ];
     
     /**
@@ -41,6 +42,7 @@ class HbAreaListValidate extends BaseValidate
         'uploadHbDetailPic'=>['pic'],
 
         'deleteHb'  =>  ['hb_id'],
+        'topHb'  =>  ['hb_id','top_id'],
 
     ];
 }

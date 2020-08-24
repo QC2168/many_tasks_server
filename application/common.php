@@ -32,6 +32,12 @@ function add_wallet_details($type,$value,$msg='未设置消息',$username=NULL){
         'msg'=>$msg
     ]);
 }
+// 查看是不是vip
+function is_vip($username){
+    // 查询
+    $privilege=new Privilege();
+    return $privilege->where(['username'=>$username])->value('vip')?true:false;
+}
 // 获取服务费用
 function get_serve_price($username,$taskType){
     // 查询
@@ -42,13 +48,13 @@ function get_serve_price($username,$taskType){
         switch ($taskType){
             // 提现手续费  百分比  0.02 =2%
             case 'out':
-                return 0.02;
+                return 0.05;
                 // 发布悬赏任务
             case 'push_task':
-                return 1.5;
+                return 2;
             // 发布抖音任务
             case 'push_dy_task':
-                return 0.2;
+                return 0.8;
                 // 发布福利任务
             case 'push_reward_task':
                 return 2.5;

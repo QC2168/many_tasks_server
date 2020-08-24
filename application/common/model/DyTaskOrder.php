@@ -8,61 +8,72 @@ use think\Model;
 class DyTaskOrder extends Model
 {
     protected $autoWriteTimestamp = true;
-    public function DyTaskList(){
-        return $this->hasMany('DyTaskList','dy_task_id','dy_task_id');
+
+    public function DyTaskList()
+    {
+        return $this->hasMany('DyTaskList', 'dy_task_id', 'dy_task_id');
     }
+
     public function createDyTaskOrder()
     {
         return Db::transaction(function () {
-        $dy_task_id = request()->param('dy_task_id');
-        $picList = request()->param('pic_list');
-        $orderSn=create_OrderSn();
-        // 判断是不是已经领取过了该任务
-        // 查询该用户历史订单
-        $historicalOrder=$this->where(['dy_task_id'=>$dy_task_id,'username'=>request()->username])->find();
-        // 查询是不是该任务的
-        if($historicalOrder){
-            TApiException('你已经申请过该任务了!',20017, 200);
-        }
-        // 判断有无名额
-        $quota=DyTaskList::where('dy_task_id',$dy_task_id)->value('remaining_quota');
-        if($quota<=0) TApiException('任务名次没有啦!',20010, 200);
-        // 名次减一
-        DyTaskList::where('dy_task_id',$dy_task_id)->setDec('remaining_quota',1);
-    $this->create([
-           'dy_task_id'=>$dy_task_id,
-            'username'=>request()->username,
-            'orderSn'=>$orderSn,
-            'status'=>0,
-        ]);
-        //提交图片
-        $task_order_pic=new DyTaskOrderPic();
-        // 判断有没有图片列表
-        $task_order_pic_list=json_decode($picList,true);
-        if(empty($task_order_pic_list)) return true;
-        // 创建图片
-        foreach ($task_order_pic_list as $key => $value){
-            $task_order_pic->create([
-                'orderSn'=>$orderSn,
-                'pic'=>$value
+            // 判断今天是不是申请过任务了
+           $todayData= $this->where('username',request()->username)
+                ->whereTime('create_time', 'today')
+                ->find();
+//if($todayData)TApiException('您今天已经申请过视频任务了',20017,200);
+            $dy_task_id = request()->param('dy_task_id');
+            $picList = request()->param('pic_list');
+            $orderSn = create_OrderSn();
+            // 判断是不是已经领取过了该任务
+            // 查询该用户历史订单
+            $historicalOrder = $this->where(['dy_task_id' => $dy_task_id, 'username' => request()->username,'status'=>['0','4','1']])->find();
+            // 查询是不是该任务的
+            if ($historicalOrder) {
+                TApiException('你已经申请过该任务了!', 20017, 200);
+            }
+            // 判断有无名额
+            $quota = DyTaskList::where('dy_task_id', $dy_task_id)->value('remaining_quota');
+            if ($quota <= 0) TApiException('任务名次没有啦!', 20010, 200);
+            // 名次减一
+            DyTaskList::where('dy_task_id', $dy_task_id)->setDec('remaining_quota', 1);
+            $this->create([
+                'dy_task_id' => $dy_task_id,
+                'username' => request()->username,
+                'orderSn' => $orderSn,
+                'status' => 0,
             ]);
-        }});
+            //提交图片
+            $task_order_pic = new DyTaskOrderPic();
+            // 判断有没有图片列表
+            $task_order_pic_list = json_decode($picList, true);
+            if (empty($task_order_pic_list)) return true;
+            // 创建图片
+            foreach ($task_order_pic_list as $key => $value) {
+                $task_order_pic->create([
+                    'orderSn' => $orderSn,
+                    'pic' => $value
+                ]);
+            }
+        });
 
     }
 
-    public function myDyTaskOrder(){
-       return $this->with('DyTaskList')->visible(['dy_task_list'=>['title','price','dy_task_pic'],'check_pic','status','orderSn','create_time'])->where('username',request()->username)->select();
+    public function myDyTaskOrder()
+    {
+        return $this->with('DyTaskList')->visible(['dy_task_list' => ['title', 'price', 'dy_task_pic'], 'check_pic', 'status', 'orderSn', 'create_time'])->where('username', request()->username)->select();
     }
 
 
-    public function changeDyOrderStatus(){
+    public function changeDyOrderStatus()
+    {
         return Db::transaction(function () {
             $orderSn = request()->param('orderSn');
             $status = request()->param('status');
             // 查询当前是不是与目标状态一样
             $currentOrderStatus = $this->where('orderSn', $orderSn)->value('status');
             $orderUser = $this->where('orderSn', $orderSn)->value('username');
-            if($currentOrderStatus!=0)return TApiException('该订单已经被操作过了',20010,200);
+            if ($currentOrderStatus != 0) return TApiException('该订单已经被操作过了', 20010, 200);
             if ($status == $currentOrderStatus) return;
             // 修改订单状态
             $save = $this->save(['status' => $status], ['orderSn' => $orderSn]);
@@ -77,30 +88,36 @@ class DyTaskOrder extends Model
                 // 添加余额
                 $assets = new Assets();
                 $add = $assets->where('username', $orderUser)->setInc('wallet', $price);
-                add_wallet_details(1,$price,"完成抖音任务",$orderUser);
+                add_wallet_details(1, $price, "完成抖音任务", $orderUser);
                 // 查找上级
                 $User = new User();
-                $f_username = $User->where(['username' =>$orderUser])->value('f_username');
+                $f_username = $User->where(['username' => $orderUser])->value('f_username');
                 if (empty($f_username)) {
                     // 如果没有上级就不用奖励了
                     return;
                 }
-                // 给上级添加
-                $team_reward = new TeamReward();
-                $r = $team_reward->where(['type' => 'dy_task_reward_one'])->value('value');
-                $add_reward = $price * $r;
-                $assets->where(['username' => $f_username])->setInc('wallet', $add_reward);
-                add_wallet_details(1,$add_reward,"一级下级".$orderUser."完成抖音任务奖励",$f_username);
-                // 获取上级的上级
-                $f_username_f_username = $User->where(['username' => $f_username])->value('f_username');
-                if (empty($f_username_f_username)) {
-                    // 如果没有上级就不用奖励了
-                    return;
+                //           查询是不是vip
+                $fUsernameIsVip = is_vip($f_username);
+                if ($fUsernameIsVip) {
+                    // 给上级添加
+                    $rate = get_serve_price($f_username, 'one_fans_video');
+                    $add_reward = $price * $rate;
+                    $assets->where(['username' => $f_username])->setInc('wallet', $add_reward);
+                    add_wallet_details(1, $add_reward, "一级下级" . $orderUser . "完成视频任务奖励", $f_username);
+                    // 获取上级的上级
+                    $f_username_f_username = $User->where(['username' => $f_username])->value('f_username');
+                    if (empty($f_username_f_username)) {
+                        // 如果没有上级就不用奖励了
+                        return;
+                    }
+                    $fUsernameFUsernameIsVip = is_vip($f_username_f_username);
+                    if ($fUsernameFUsernameIsVip) {
+                        $r2 = get_serve_price($f_username_f_username, 'two_fans_video');
+                        $add_reward2 = $price * $r2;
+                        $assets->where(['username' => $f_username_f_username])->setInc('wallet', $add_reward2);
+                        add_wallet_details(1, $add_reward2, "二级下级" . $orderUser . "完成视频任务奖励", $f_username_f_username);
+                    }
                 }
-                $r2 = $team_reward->where(['type' => 'dy_task_reward_two'])->value('value');
-                $add_reward2 = $price * $r2;
-                $assets->where(['username' => $f_username_f_username])->setInc('wallet', $add_reward2);
-                add_wallet_details(1,$add_reward2,"一级下级".$orderUser."完成抖音任务奖励",$f_username);
             }
             if ($status == 2) {
                 // 修改为完成
@@ -115,29 +132,35 @@ class DyTaskOrder extends Model
         });
     }
 
-    public function myPushDyTaskOrder(){
-        $dy_task_id= request()->param('dy_task_id_select');
+    public function myPushDyTaskOrder()
+    {
+        $dy_task_id = request()->param('dy_task_id_select');
         // 是否是请求这个人发布的任务
-        $is=DyTaskList::where(['username'=>request()->username,'dy_task_id'=>$dy_task_id])->find();
-        if(!$is) TApiException('发布者与查询者不一致', 20007, 200);
-       return  $this->where(['dy_task_id'=>$dy_task_id])->hidden(['dy_task_id','id'])->select();
+        $is = DyTaskList::where(['username' => request()->username, 'dy_task_id' => $dy_task_id])->find();
+        if (!$is) TApiException('发布者与查询者不一致', 20007, 200);
+        return $this->where(['dy_task_id' => $dy_task_id])->hidden(['dy_task_id', 'id'])->select();
     }
 
-    public function getADyTaskOrderList(){
-        $page=request()->param('index');
-        $data= $this->page($page,10)->select();
-        $row=$this->count();
-        return ['data'=>$data,'row'=>$row];
+    public function getADyTaskOrderList()
+    {
+        $page = request()->param('index');
+        $data = $this->page($page, 10)->select();
+        $row = $this->count();
+        return ['data' => $data, 'row' => $row];
     }
+
     // 后台  获取该订单详细信息
-    public function  getDyTaskOrderDetail(){
-        $orderSn=request()->param('orderSn');
-        return $this->with('DyTaskList')->where(['orderSn'=>$orderSn])->find();
+    public function getDyTaskOrderDetail()
+    {
+        $orderSn = request()->param('orderSn');
+        return $this->with('DyTaskList')->where(['orderSn' => $orderSn])->find();
     }
+
     // 查看任务订单图片
-    public function selectOrderPic(){
-        $orderSn=request()->param('orderSn');
-        $order_pic=new DyTaskOrderPic();
-        return $order_pic->where('orderSn',$orderSn)->field('pic')->select();
+    public function selectOrderPic()
+    {
+        $orderSn = request()->param('orderSn');
+        $order_pic = new DyTaskOrderPic();
+        return $order_pic->where('orderSn', $orderSn)->field('pic')->select();
     }
 }

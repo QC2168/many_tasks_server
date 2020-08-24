@@ -22,7 +22,7 @@ class TaskOrder extends BaseController
     {
         (new TaskOrderValidate())->goCheck('uploadTaskOrderPic');
         $pic = request()->file('pic');
-        $info = $pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/TaskOrderPic');
+        $info = $pic->validate(['size' => 5242880, 'ext' => 'jpg,png,gif'])->move('../public/static/TaskOrderPic');
         if ($info == false) TApiException('图片上传失败', 20009, 200);
         $getSaveName = str_replace("\\", "/", $info->getSaveName());
         return self::showResCode('上传成功','/static/TaskOrderPic/'.$getSaveName);

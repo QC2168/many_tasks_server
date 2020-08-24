@@ -38,7 +38,7 @@ class DyTaskList extends Model
         $param = request()->param();
         // 获取表单上传文件
         $pic = request()->file('dy_task_pic');
-        $info = $pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskPic');
+        $info = $pic->validate(['size' => 5242880, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskPic');
         if($info==false)TApiException('图片上传失败',20009, 200);
         $getSaveName = str_replace("\\", "/", $info->getSaveName());
         // 判断余额是否足够

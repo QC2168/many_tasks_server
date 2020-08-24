@@ -69,16 +69,23 @@ public function uploadUserPic(){
             ]);
 // 首页通知
             $HbAreaNoticeBar=new HbAreaNoticeBar();
-            $HbAreaNoticeBar->save(['username'=>request()->username,'status'=>1,'content'=>'欢迎用户 '.substr(request()->username,0,2).'*** 加入互粉']);
-            // 有上级才有奖励
-            if(!empty($fUsername)){
-                $Assets->where('username',request()->username)->setInc('wallet',1 );
-                add_wallet_details(1,1,"新人福利");
-                $Assets->where('username',$fUsername)->setInc('wallet',.3 );
-                add_wallet_details(1,.3,"邀请奖励-新用户:".request()->username);
-                $HbAreaNoticeBar->save(['username'=>request()->username,'status'=>1,'content'=>'互粉用户'.substr($fUsername,0,2).'*** 邀请'.substr(request()->username,0,2).' 加入互粉,福利已发放！']);
-
+            $nameLength=strlen(request()->username);
+            if ($nameLength>4){
+                $HbAreaNoticeBar->save(['username'=>request()->username,'status'=>1,'content'=>'欢迎用户 '.substr(request()->username,0,2).'*** 加入互粉']);
+            }else{
+                $HbAreaNoticeBar->save(['username'=>request()->username,'status'=>1,'content'=>'欢迎用户 '.request()->username.'*** 加入互粉']);
             }
+
+            // 有上级才有奖励
+            // 修改成首次发红包奖励 2020-8-16
+//            if(!empty($fUsername)){
+//                $Assets->where('username',request()->username)->setInc('wallet',1 );
+//                add_wallet_details(1,1,"新人福利");
+//                $Assets->where('username',$fUsername)->setInc('wallet',.3 );
+//                add_wallet_details(1,.3,"邀请奖励-新用户:".request()->username);
+//                $HbAreaNoticeBar->save(['username'=>request()->username,'status'=>1,'content'=>'互粉用户'.substr($fUsername,0,2).'*** 邀请'.substr(request()->username,0,2).' 加入互粉,福利已发放！']);
+//
+//            }
 
         });
         return true;

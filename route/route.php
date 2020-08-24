@@ -47,6 +47,7 @@ Route::group('api/:version/',function(){
     Route::get('my_push_dy_task','api/:version.DyTaskList/myPushDyTask');
     Route::get('my_push_task','api/:version.TaskList/myPushTask');
     Route::get('my_Hb','api/:version.HbAreaList/myHb');
+    Route::get('get_hb_top_list','api/:version.HbAreaList/getHbTopList');
 //    Route::get('my_push_reward_task','api/:version.RewardTaskList/myPushRewardTask');
     Route::get('my_push_dy_task_order','api/:version.DyTaskOrder/myPushDyTaskOrder');
     Route::get('get_news','api/:version.News/getNews');
@@ -65,6 +66,7 @@ Route::group('api/:version/',function(){
     Route::post('delete_task','api/:version.TaskList/deleteTask');
     Route::post('delete_dy_task','api/:version.DyTaskList/deleteDyTask');
     Route::post('delete_hb','api/:version.HbAreaList/deleteHb');
+    Route::post('top_hb','api/:version.HbAreaList/topHb');
     Route::post('feedback','api/:version.User/feedback');
     Route::post('post_out_order','api/:version.OutOrderList/postOutOrder');
     Route::post('create_dy_task_order','api/:version.DyTaskOrder/createDyTaskOrder');

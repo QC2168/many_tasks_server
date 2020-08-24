@@ -58,7 +58,7 @@ class DyTaskOrder extends BaseController
     {
         (new DyTaskOrderValidate())->goCheck('uploadDyTaskOrderPic');
         $pic = request()->file('pic');
-        $info = $pic->validate(['size' => 2097152, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskOrderPic');
+        $info = $pic->validate(['size' => 5242880, 'ext' => 'jpg,png,gif'])->move('../public/static/DyTaskOrderPic');
         if ($info == false) TApiException('图片上传失败', 20009, 200);
         $getSaveName = str_replace("\\", "/", $info->getSaveName());
         return self::showResCode('上传成功','/static/DyTaskOrderPic/'.$getSaveName);

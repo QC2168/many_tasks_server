@@ -64,14 +64,16 @@ public function buyPrivilegedGoods(){
         }
         $serve_price=TeamReward::where('type','open_vip_one')->value('value');
         $assets->where(['username'=>$f_username])->setInc('wallet',($goodsPrice*$serve_price));
+        add_wallet_details(1,($goodsPrice*$serve_price),'一级下级'.request()->username.'购买特权'.$buy_menber_type,$f_username);
 //        // 获取上级的上级
-//        $f_username_f_username=$User->where(['username'=>$f_username])->value('f_username');
-//        if(empty($f_username_f_username)){
-//            // 如果没有上级就不用奖励了
-//            return;
-//        }
-//        $serve_price=TeamReward::where('type','open_vip_two')->value('value');
-//        $assets->where(['username'=>$f_username_f_username])->setInc('wallet',$goodsPrice*$serve_price);
+        $f_username_f_username=$User->where(['username'=>$f_username])->value('f_username');
+        if(empty($f_username_f_username)){
+            // 如果没有上级就不用奖励了
+            return;
+        }
+        $serve_price=TeamReward::where('type','open_vip_two')->value('value');
+        $assets->where(['username'=>$f_username_f_username])->setInc('wallet',($goodsPrice*$serve_price));
+        add_wallet_details(1,($goodsPrice*$serve_price),'二级下级'.request()->username.'购买特权'.$buy_menber_type,$f_username_f_username);
     });
 
 
