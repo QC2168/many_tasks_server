@@ -56,6 +56,7 @@ Route::group('api/:version/',function(){
     Route::get('get_out_order','api/:version.OutOrderList/getOutOrder');
     Route::get('get_team','api/:version.User/team');
     Route::get('get_user_wallet_details','api/:version.Assets/getUserWalletDetails');
+    Route::get('get_user_today_wallet_details_sum','api/:version.Assets/getUserTodayWalletDetailsSum');
     Route::post('push_task','api/:version.TaskList/pushTask');
 //    Route::post('push_reward_task','api/:version.RewardTaskList/pushRewardTask');
     Route::post('sign','api/:version.Sign/sign');

@@ -18,4 +18,8 @@ class Assets extends BaseController
         $WalletDetails=(new WalletDetailsModel())->getUserWalletDetails();
         return self::showResCode('获取成功',$WalletDetails);
     }
+    public function getUserTodayWalletDetailsSum(){
+        $WalletDetails=(new WalletDetailsModel())->getUserTodayWalletDetailsSum();
+        return self::showResCode('获取成功',$WalletDetails);
+    }
 }

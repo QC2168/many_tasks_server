@@ -13,4 +13,9 @@ class WalletDetails extends Model
     {
        return $this->where('username',request()->username)->order(['create_time'=>'desc'])->select();
     }
+    // 获取用户当天收益
+    public function getUserTodayWalletDetailsSum()
+    {
+       return $this->where(['username'=>request()->username,'type'=>1])->whereTime('create_time', 'today')->sum('value');
+    }
 }
