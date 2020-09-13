@@ -2,6 +2,7 @@
 
 namespace app\common\model;
 
+use think\Db;
 use think\Model;
 
 class HbAreaCommentList extends Model
@@ -12,6 +13,7 @@ class HbAreaCommentList extends Model
         return $this->hasOne('User','username','username');
     }
     public function commitComment(){
+        return Db::transaction(function () {
         $param = request()->param();
 
         // 判断之前是否已经领取过红包
@@ -134,10 +136,13 @@ class HbAreaCommentList extends Model
 
         }
 
-
+        });
 
     }
     public function getHbDetailCommentList(){
-        return $this->where('show','<>','0')->where('hb_id',request()->param('hb_id'))->with('User')->visible(['user'=>['user_pic']])->select();
+//        return $this->where('show','<>','0')->where('hb_id',request()->param('hb_id'))->with('User')->visible(['user'=>['user_pic']])->select();
+        $index = request()->param("index");
+        $list = $this->where('show', '<>', '0')->where('hb_id',request()->param('hb_id'))->with('User')->visible(['user'=>['user_pic']])->order('create_time', 'desc')->paginate(10, false, ['page' => $index]);
+        return $list;
     }
 }

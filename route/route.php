@@ -60,6 +60,8 @@ Route::group('api/:version/',function(){
     Route::post('push_task','api/:version.TaskList/pushTask');
 //    Route::post('push_reward_task','api/:version.RewardTaskList/pushRewardTask');
     Route::post('sign','api/:version.Sign/sign');
+    Route::post('userAuth','api/:version.OutId/userAuth');
+    Route::get('checkAuth','api/:version.OutId/checkAuth');
     Route::post('sign_data','api/:version.Sign/signData');
     Route::post('push_dy_task','api/:version.DyTaskList/pushDyTask');
     Route::post('push_hb','api/:version.HbAreaList/pushHb');

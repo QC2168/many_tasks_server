@@ -11,7 +11,7 @@ class Assets extends Model
     public function assets()
     {
         $assets=$this->where('username', request()->username)->hidden(['username'])->find();
-        $bind=request()->userTokenUserInfo['phone'];
+        $bind=OutId::where(['username'=> request()->username])->value('zfb');
         return ['assets'=>$assets,'bind'=>$bind];
     }
 }

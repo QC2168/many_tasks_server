@@ -31,7 +31,7 @@ public function changePrivilegedGood(){
 }
 // 购买VIP
 public function buyPrivilegedGoods(){
-    Db::transaction(function () {
+   return Db::transaction(function () {
  // 获取购买的会员类型
  $buy_menber_type=request()->param('type');
 // 获取这个商品的价格

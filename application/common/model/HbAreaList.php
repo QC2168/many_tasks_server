@@ -2,6 +2,7 @@
 
 namespace app\common\model;
 
+use think\Db;
 use think\Model;
 
 class HbAreaList extends Model
@@ -27,7 +28,7 @@ class HbAreaList extends Model
     {
 
         $index = request()->param("index");
-        $list = $this->where('show', '<>', '0')->with(['User', 'HbAreaPic', 'HbAreaCommentList'])->visible(['user' => ['user_pic'], 'hb_area_comment_list' => ['content']])->order('priority', 'desc')->paginate(10, false, ['page' => $index]);
+        $list = $this->where('show', '<>', '0')->with(['User', 'HbAreaPic', 'HbAreaCommentList'])->visible(['user' => ['user_pic'], 'hb_area_comment_list' => ['content']])->order('create_time', 'desc')->paginate(10, false, ['page' => $index]);
         return $list;
 
     }
@@ -44,28 +45,30 @@ class HbAreaList extends Model
 
     public function deleteHb()
     {
-        $hb_id = request()->param('hb_id');
-        //判断发布的用户
-        $isUsername = $this->where('hb_id', $hb_id)->value('username');
-        if (request()->username != $isUsername) TApiException('发布者与下架不一致', 20007, 200);
-        // 获取状态
-        $isdelete = $this->where('hb_id', $hb_id)->value('show');
-        // 该任务已经被删除了
-        if ($isdelete == 0) TApiException('任务已经被删除了', 20006, 200);
-        // 修改任务状态
-        $this->where('hb_id', $hb_id)->update(['show' => 0]);
-        // 计算退回的金额
-        $hb_data = $this->where('hb_id', $hb_id)->find();
-        $returnAmount = $hb_data['remaining_hb_amount'];
-        //更新
-        Assets::where('username', request()->username)->setInc('wallet', $returnAmount);
-        add_wallet_details(1, $returnAmount, "下架红包，返回剩下金额");
-        return true;
-
+        return Db::transaction(function () {
+            $hb_id = request()->param('hb_id');
+            //判断发布的用户
+            $isUsername = $this->where('hb_id', $hb_id)->value('username');
+            if (request()->username != $isUsername) TApiException('发布者与下架不一致', 20007, 200);
+            // 获取状态
+            $isdelete = $this->where('hb_id', $hb_id)->value('show');
+            // 该任务已经被删除了
+            if ($isdelete == 0) TApiException('任务已经被删除了', 20006, 200);
+            // 修改任务状态
+            $this->where('hb_id', $hb_id)->update(['show' => 0]);
+            // 计算退回的金额
+            $hb_data = $this->where('hb_id', $hb_id)->find();
+            $returnAmount = $hb_data['remaining_hb_amount'];
+            //更新
+            Assets::where('username', request()->username)->setInc('wallet', $returnAmount);
+            add_wallet_details(1, $returnAmount, "下架红包，返回剩下金额");
+            return true;
+        });
     }
 
     public function topHb()
     {
+        return Db::transaction(function () {
         $hb_id = request()->param('hb_id');
         $top_id = request()->param('top_id');
         $HbTopSelectList = new HbTopSelectList();
@@ -81,10 +84,12 @@ class HbAreaList extends Model
         Assets::where('username', request()->username)->setDec('wallet', $topPrice);
         add_wallet_details(2, $topPrice, "置顶消费_" . $hb_id);
         return true;
+        });
     }
 
     public function pushHb()
     {
+        return Db::transaction(function () {
         // 查看是不是第一次发布
         $isFirst = $this->where('username', request()->username)->find();
         $param = request()->param();
@@ -153,6 +158,8 @@ class HbAreaList extends Model
             // 余额不足
             TApiException('当前账户余额不足', 20005, 200);
         }
+
+        });
     }
 
 

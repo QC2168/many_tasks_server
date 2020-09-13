@@ -12,6 +12,12 @@ class Sign extends Model
     // 签到
     public function sign(){
        return Db::transaction(function () {
+           // 判断今天是否完成了悬赏任务 / 抖音任务
+          $TaskOrder= new TaskOrder();
+           $DyTaskOrder= new DyTaskOrder();
+           $todayDyTaskOrder=$DyTaskOrder->where(['username'=>request()->username,'status'=>1])->whereTime('create_time', 'today')->find();
+           $todayTaskOrder= $TaskOrder->where(['username'=>request()->username,'status'=>1])->whereTime('create_time', 'today')->find();
+           if(empty($todayDyTaskOrder) && empty($todayTaskOrder))TApiException('请完成任意一个任务再来签到',20012,200);
            // 获取用户钱包
            $userCurrentWallet=Assets::where(['username'=>request()->username])->value('wallet');
         // 判断用户今天是否签到了
@@ -34,10 +40,12 @@ class Sign extends Model
             // 昨天的24
             $YesterdayEnd=strtotime("-1 day",$dayEnd);
             if($last_time >= $YesterdayBegin && $last_time <= $YesterdayEnd){
+                // 连续签到
+
                 $this->where(['username'=>request()->username])->setInc('continued',1);
                 // 签到福利
                 $assets=new Assets();
-                $addPrice=$userCurrentWallet>=9.5?(random_int(1,3)*0.01):$userCurrentWallet>=8?(random_int(1,6)*0.1):(random_int(2,6)*0.15);
+                $addPrice=(random_int(1,3)*0.1)/2;
                 $assets->where(['username'=>request()->username])->setInc('wallet',$addPrice);
                 $signLog=new SignLog();
                 $signLog->create([
@@ -47,9 +55,10 @@ class Sign extends Model
                 add_wallet_details(1,$addPrice,'签到奖励');
                 return "签到成功，本次获得{$addPrice}元";
             }else{
+                // 第一次签到 或者是断签了
                 $assets=new Assets();
                 $this->save(['continued'=>1],['username'=>request()->username]);
-                $randomPrice=$userCurrentWallet>=9.5?(random_int(1,3)*0.01):$userCurrentWallet>=8?(random_int(1,6)*0.1):(random_int(3,9)*0.35);
+                $randomPrice=(random_int(1,4)*0.1)/2;
 
                 $assets->where(['username'=>request()->username])->setInc('wallet',$randomPrice);
                 $signLog=new SignLog();

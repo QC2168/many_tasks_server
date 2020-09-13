@@ -7,7 +7,10 @@ use think\Model;
 class OutOrderList extends Model
 {
     protected $autoWriteTimestamp = true;
-
+    public function User()
+    {
+        return $this->hasOne('User','username', 'username');
+    }
     // 提现
     public function postOutOrder()
     {
@@ -51,7 +54,7 @@ class OutOrderList extends Model
     // 获取提现订单  后台
     public function getAOutOrder(){
         $page=request()->param('index');
-        $data= $this->page($page,10)->select();
+        $data= $this->with('User')->visible(['user'=>['phone']])->page($page,10)->select();
         $row=$this->count();
         return ['data'=>$data,'row'=>$row];
     }
